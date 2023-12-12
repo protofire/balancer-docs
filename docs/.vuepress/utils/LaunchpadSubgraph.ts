@@ -3,7 +3,7 @@ import {
   InMemoryCache,
   NormalizedCacheObject,
   gql,
-} from '@apollo/client/core';
+} from '@apollo/client/core/index';
 import { ethers, BigNumberish } from 'ethers';
 
 type RewardDistributor = {
