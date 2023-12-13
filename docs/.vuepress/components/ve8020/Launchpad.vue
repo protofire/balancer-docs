@@ -13,6 +13,9 @@ const handleClickContainer = () => {
 const closeCalendar = () => {
   openCalendar.value = false;
 };
+
+const weeksToSeconds = weeks => weeks * 7 * 24 * 60 * 60;
+
 const date = new Date();
 const formatedDate = date => {
   const formattedDate = date.toLocaleString('en-US', {
@@ -47,11 +50,11 @@ const selectedMonthsValue = ref('');
 const selectedYearsValue = ref('');
 
 const computedLockTime = computed(() => {
-  const weeks = parseInt(selectedWeeksValue.value) || 0;
-  const months = parseInt(selectedMonthsValue.value) * 4 || 0;
-  const years = parseInt(selectedYearsValue.value) * 48 || 0;
+  let weeks = parseInt(selectedWeeksValue.value) || 0;
+  weeks += parseInt(selectedMonthsValue.value) * 4 || 0;
+  weeks += parseInt(selectedYearsValue.value) * 52 || 0;
 
-  return weeks + months + years;
+  return weeksToSeconds(weeks);
 });
 
 const isFormValid = ref(false);
