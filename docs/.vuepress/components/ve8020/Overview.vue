@@ -9,8 +9,8 @@ const { data: veSystems } = useLaunchpad();
   <section class="section-container">
     <div class="card-container">
       <TokenCard
-        v-for="(token, index) in veSystems"
-        :key="index"
+        v-for="token in veSystems"
+        :key="token.id"
         :name="token.id"
         :vestedToken="token.bptTokenName"
         :totalValueVested="ethers.formatEther(token.votingEscrow.lockedAmount)"
