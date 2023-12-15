@@ -24,7 +24,6 @@ const props = defineProps({
       </article>
       <article class="item-row labels-tokens">
         <p class="item-name">Available Tokens for Rewards</p>
-        <!-- <p class="item-value">{{ availableTokensForRewards.join(', ') }}</p> -->
         <div class="label-group">
           <LabelToken
             v-for="label in props.availableTokensForRewards"

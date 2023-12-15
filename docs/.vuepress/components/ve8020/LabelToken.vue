@@ -7,7 +7,7 @@ const props = defineProps({
 </script>
 
 <template>
-  <p class="label">{{ props.label }}</p>
+  <p class="label" :title="props.label">{{ props.label }}</p>
 </template>
 
 <style scoped>
@@ -18,5 +18,7 @@ const props = defineProps({
   background: #384aff33;
   border-radius: 5px;
   max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>
