@@ -14,6 +14,9 @@
           class="input"
         />
       </div>
+      <div class="item-action">
+        <button class="submit-button">SET</button>
+      </div>
     </div>
   </form>
 </template>
@@ -41,7 +44,7 @@ input[type='number'] {
   display: flex;
   width: 100%;
   align-items: center;
-  justify-content: space-between;
+  /* justify-content: space-between; */
   max-width: 700px;
 }
 
@@ -53,13 +56,21 @@ input[type='number'] {
   margin: 0;
 }
 
+.item-row .item-action {
+  max-width: 100px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-left: 4px;
+  display: flex;
+}
+
 .item-row .input-group,
 .item-row .lock-group {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   height: 45px;
-  width: 50%;
+  width: 70%;
 }
 
 .item-row .input-group .input,
