@@ -14,7 +14,7 @@ const { data: veSystems } = useLaunchpad();
         :name="token.id"
         :vestedToken="token.bptTokenName"
         :totalValueVested="ethers.formatEther(token.votingEscrow.lockedAmount)"
-        :availableTokensForRewards="token.rewardDistributor.rewardNames"
+        :availableTokensForRewards="token.rewardDistributor.rewardTokens || []"
       />
     </div>
   </section>
