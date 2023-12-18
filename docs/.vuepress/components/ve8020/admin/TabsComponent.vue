@@ -1,6 +1,7 @@
 <script setup>
 import Launchpad from '../Launchpad.vue';
 import Configuration from '../Configuration.vue';
+import RewardsDistribution from './RewardsDistribution.vue';
 import Wallet from '../../Navbar/Wallet.vue';
 </script>
 
@@ -49,7 +50,7 @@ import Wallet from '../../Navbar/Wallet.vue';
     </div>
 
     <div v-show="activeTab === 4" class="body-container">
-      <p>Rewards Distribution</p>
+      <RewardsDistribution />
     </div>
   </div>
 </template>
