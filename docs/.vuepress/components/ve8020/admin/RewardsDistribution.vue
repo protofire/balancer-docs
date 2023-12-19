@@ -2,26 +2,123 @@
 import { ref } from 'vue';
 
 const newReward = ref<string>();
+const currentWeek = ref<string>();
+const amountCurrentWeek = ref<number>();
+const nWeek = ref<string>();
+const amountNWeek = ref<number>();
+const weeks = ref<number>();
+const exactWeek = ref<string>();
+const amountExactWeek = ref<number>();
+const calendar = ref<number>();
 </script>
 
 <template>
   <form class="section-container">
     <div key="newReward" class="item-row">
       <p class="item-name">Set Available Rewards</p>
-      <div class="input-group">
-        <input
-          v-model="newReward"
-          placeholder="0xa0b...6eb48"
-          type="text"
-          name="newReward"
-          class="input"
-        />
-      </div>
       <div class="item-action">
-        <button class="submit-button">SET</button>
+        <div class="input-group">
+          <input
+            v-model="newReward"
+            placeholder="0xa0b...6eb48"
+            type="text"
+            name="newReward"
+            class="input"
+          />
+        </div>
+        <button class="submit-button">Set</button>
+      </div>
+    </div>
+    <div key="currentWeek" class="item-row">
+      <p class="item-name">Add Rewards into Current Week</p>
+      <div class="item-action">
+        <div class="input-group current-week">
+          <input
+            v-model="currentWeek"
+            placeholder="Token address (0xab...)"
+            type="text"
+            name="currentWeek"
+            class="input"
+          />
+        </div>
+        <input
+          v-model="amountCurrentWeek"
+          placeholder="Amount"
+          type="number"
+          name="amountCurrentWeek"
+          class="input-amount"
+        />
+        <button class="submit-button">Add</button>
+      </div>
+    </div>
+    <div key="nWeek" class="item-row">
+      <p class="item-name">Add Rewards into N Weeks</p>
+      <div class="item-action">
+        <div class="input-group n-week">
+          <input
+            v-model="nWeek"
+            placeholder="Token address (0xab...)"
+            type="text"
+            name="nWeek"
+            class="input"
+          />
+        </div>
+        <input
+          v-model="amountNWeek"
+          placeholder="Amount"
+          type="number"
+          name="amountNWeek"
+          class="input-amount"
+        />
+        <div class="input-group weeks-container">
+          <p class="title-input">weeks</p>
+          <input
+            v-model="weeks"
+            placeholder="10"
+            type="number"
+            name="weeks"
+            class="input"
+          />
+        </div>
+        <button class="submit-button">Add</button>
+      </div>
+    </div>
+    <div key="exactWeek" class="item-row">
+      <p class="item-name">Add Rewards into Exact Week</p>
+      <div class="item-action">
+        <div class="input-group calendar-group">
+          <input
+            v-model="exactWeek"
+            placeholder="0xa0b...6eb48"
+            type="text"
+            name="exactWeek"
+            class="input"
+          />
+        </div>
+        <input
+          v-model="amountExactWeek"
+          placeholder="Amount"
+          type="number"
+          name="amountExactWeek"
+          class="input-amount"
+        />
+        <div class="input-group calendar-container">
+          <p class="title-input">calendar</p>
+          <input
+            v-model="calendar"
+            placeholder="2023/30/11"
+            type="date"
+            name="calendar"
+            class="input"
+          />
+        </div>
+        <button class="submit-button">Add</button>
       </div>
     </div>
   </form>
+  <div class="btn-group">
+    <button class="available-button">Available Rewards</button>
+  </div>
 </template>
 
 <style scoped>
@@ -47,12 +144,14 @@ input[type='number'] {
   display: flex;
   width: 100%;
   align-items: center;
-  /* justify-content: space-between; */
+  justify-content: space-between;
   max-width: 700px;
+  height: 45px;
+  gap: 10px;
 }
 
 .item-row .item-name {
-  width: 50%;
+  width: 40%;
   max-width: 350px;
   font-size: 14px;
   font-weight: 500;
@@ -60,31 +159,48 @@ input[type='number'] {
 }
 
 .item-row .item-action {
-  max-width: 100px;
-  font-size: 14px;
-  font-weight: 500;
-  margin-left: 4px;
   display: flex;
+  width: 60%;
+  align-items: center;
+  height: 100%;
+  gap: 10px;
 }
 
-.item-row .input-group,
-.item-row .lock-group {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  height: 45px;
-  width: 70%;
+.item-row .input-group {
+  height: 100%;
+  width: calc(100% - 70px);
+}
+
+.item-row .input-group.current-week {
+  width: calc(100% - 150px);
+}
+
+.item-row .input-group.n-week {
+  width: calc(100% - 200px);
+}
+
+.item-row .input-group.calendar-group {
+  width: calc(100% - 260px);
+}
+
+.item-row .input-group.weeks-container {
+  width: 50px;
+  position: relative;
+}
+
+.item-row .input-group.calendar-container {
+  width: 110px;
+  position: relative;
 }
 
 .item-row .input-group .input,
-.item-row .lock-group .input {
+.item-row .item-action .input-amount {
   background-color: transparent;
   border: 1px solid #e2e8f0;
   position: relative;
   border-radius: 6px;
   height: 100%;
   width: 100%;
-  max-width: 340px;
   padding-inline: 20px;
   font-size: 14px;
   outline: none;
@@ -92,73 +208,53 @@ input[type='number'] {
   align-items: center;
 }
 
+.item-row .input-group.weeks-container .title-input,
+.item-row .input-group.calendar-container .title-input {
+  position: absolute;
+  font-size: 11px;
+  margin: 0;
+  top: 1px;
+}
+
+.item-row .input-group.weeks-container .title-input {
+  left: 9px;
+}
+
+.item-row .input-group.calendar-container .title-input {
+  left: 5px;
+}
+
+.item-row .item-action .input-amount {
+  width: 70px;
+  padding-inline: 10px;
+}
+
+.item-row .item-action .input-group.weeks-container .input {
+  width: 50px;
+  padding-inline: 10px;
+  padding-top: 10px;
+}
+
+.item-row .item-action .input-group.calendar-container .input {
+  width: 110px;
+  padding-inline: 10px;
+  padding-top: 10px;
+}
 .dark .item-row .input-group .input,
-.dark .item-row .lock-group .input {
+.dark .item-row .item-action .input-amount {
   border: 1px solid #3e4c5a;
 }
 
 .item-row .input-group .input:focus,
-.item-row .lock-group .input:focus {
+.dark .item-row .item-action .input-amount:focus {
   border: 1px solid #384aff;
 }
 
-.item-row .input-group .input .icon {
-  fill: #2c3e50;
-  cursor: pointer;
-}
-.dark .item-row .input-group .input .icon {
-  fill: #ffffff;
-}
-.item-row .input-group .input .text {
-  font-size: 14px;
-  width: 100%;
-  height: 100%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  margin: 0;
-}
-.item-row .input-group .input .text.disabled {
-  color: #999;
-}
-
-.dark .item-row .input-group .input .text.disabled {
-  color: #666;
-}
-
-.item-row .lock-group {
-  gap: 8px;
-  max-width: 340px;
-  width: 50%;
-}
-
-.item-row .lock-group .time-group {
-  display: flex;
-  align-items: center;
-  height: 100%;
-  max-width: 75px;
-  width: 33%;
-  position: relative;
-}
-
-.item-row .lock-group .time-group .input {
-  width: 100%;
-  padding: 0;
-  padding-left: 12px;
-  padding-top: 14px;
-}
-.time-group .text {
-  margin: 0;
-  font-size: 12px;
-  position: absolute;
-  top: 2px;
-  left: 10px;
-}
-
-.submit-button {
-  width: 180px;
-  height: 40px;
-  background-color: #384aff;
+.submit-button,
+.available-button {
+  width: 60px;
+  height: 45px;
+  background-color: #eaf0f6;
   border-radius: 6px;
   cursor: pointer;
   align-self: flex-end;
@@ -167,8 +263,26 @@ input[type='number'] {
   box-shadow: none;
   border: none;
 }
-.submit-button:disabled {
-  background-color: rgba(56, 74, 255, 0.2);
+.btn-group {
+  margin-top: 30px;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: flex-end;
+  max-width: 700px;
+  height: 45px;
+}
+.available-button {
+  width: 180px;
+}
+
+.dark .submit-button,
+.dark .available-button {
+  background-color: #384aff;
+}
+.submit-button:disabled,
+.available-button:disabled {
+  opacity: 0.2;
   cursor: no-drop;
 }
 </style>
