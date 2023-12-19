@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useWeb3ModalProvider } from '@web3modal/ethers/vue';
+import { useNetwork } from '../../../providers/network';
+import { useController } from '../../../utils/RewardsDistributionController';
+import { useVeSystem } from '../../../providers/veSystem';
 
-const newReward = ref<string>();
+const newReward = ref<string | undefined>();
 const currentWeek = ref<string>();
 const amountCurrentWeek = ref<number>();
 const nWeek = ref<string>();
@@ -10,10 +14,43 @@ const weeks = ref<number>();
 const exactWeek = ref<string>();
 const amountExactWeek = ref<number>();
 const calendar = ref<number>();
+const isLoading = ref<boolean>(false);
+
+const { walletProvider } = useWeb3ModalProvider();
+
+const { selected: veSystem } = useVeSystem();
+const { network } = useNetwork();
+const { addAllowedRewardTokens } = useController({
+  walletProvider,
+  network,
+  veSystem,
+});
+
+const handleSetAvailableReward = async (address: string) => {
+  console.log('address', address);
+  await addAllowedRewardTokens.value?.([address], {
+    onPrompt: () => {
+      console.log('prompt');
+      isLoading.value = true;
+    },
+    onSubmitted: ({ tx }) => {
+      console.log('submitted', tx);
+    },
+    onSuccess: ({ receipt }) => {
+      console.log('success', receipt);
+      isLoading.value = false;
+      newReward.value = undefined;
+    },
+    onError: err => {
+      console.log('err', err);
+      isLoading.value = false;
+    },
+  });
+};
 </script>
 
 <template>
-  <form class="section-container">
+  <div class="section-container">
     <div key="newReward" class="item-row">
       <p class="item-name">Set Available Rewards</p>
       <div class="item-action">
@@ -26,7 +63,13 @@ const calendar = ref<number>();
             class="input"
           />
         </div>
-        <button class="submit-button">Set</button>
+        <button
+          class="submit-button"
+          :disabled="newReward === undefined || isLoading"
+          @click="newReward && handleSetAvailableReward(newReward)"
+        >
+          {{ isLoading ? 'Setting...' : 'Set' }}
+        </button>
       </div>
     </div>
     <div key="currentWeek" class="item-row">
@@ -115,7 +158,7 @@ const calendar = ref<number>();
         <button class="submit-button">Add</button>
       </div>
     </div>
-  </form>
+  </div>
   <div class="btn-group">
     <button class="available-button">Available Rewards</button>
   </div>
@@ -282,7 +325,7 @@ input[type='number'] {
 }
 .submit-button:disabled,
 .available-button:disabled {
-  opacity: 0.2;
-  cursor: no-drop;
+  background-color: rgba(56, 74, 255, 0.2);
+  cursor: not-allowed;
 }
 </style>

@@ -10,7 +10,7 @@ const graph = new LaunchpadSubgraph(SUBGRAPH_URL);
 export const veSystemProvider = () => {
   const data = ref<VeSystem[]>([]);
   const isLoading = ref<boolean>(false);
-  const selected = ref<VeSystem>();
+  const selected = ref<VeSystem | undefined>();
 
   watch(selected, value => console.log('Selected VeSystem: ', value));
 

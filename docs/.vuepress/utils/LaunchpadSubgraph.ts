@@ -26,6 +26,7 @@ export type VeSystem = {
   bptTokenName: string;
   votingEscrow: VotingEscrow;
   rewardDistributor: RewardDistributor;
+  rewardDistributorAddress: string;
 };
 
 type RawVotingEscrow = {
@@ -42,6 +43,7 @@ type RawVeSystem = {
   bptTokenName: string;
   votingEscrow: RawVotingEscrow;
   rewardDistributor: RewardDistributor;
+  rewardDistributorAddress: string;
 };
 
 type GetVeSystemsResponse = {
@@ -89,6 +91,7 @@ export class LaunchpadSubgraph {
             symbol
             lockedAmount
           }
+          rewardDistributorAddress
           rewardDistributor {
             id
             rewardTokens
@@ -119,6 +122,7 @@ export class LaunchpadSubgraph {
             symbol
             lockedAmount
           }
+          rewardDistributorAddress
           rewardDistributor {
             id
             rewardTokens

@@ -379,6 +379,6 @@ input[type='number'] {
 }
 .submit-button:disabled {
   background-color: rgba(56, 74, 255, 0.2);
-  cursor: no-drop;
+  cursor: not-allowed;
 }
 </style>

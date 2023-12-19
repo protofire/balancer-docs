@@ -2,6 +2,7 @@ import { ethers, BrowserProvider } from 'ethers';
 import { Ref, watch, ref } from 'vue';
 import { NetworkConfig } from '../constants/networks';
 import { CallbackOptionsType, submitAction } from './LaunchpadController';
+import { VeSystem } from './LaunchpadSubgraph';
 
 type DeployFunctionType = (
   data: string[],
@@ -19,7 +20,7 @@ const ABI = [
 export const useController = ({
   walletProvider,
   network,
-  address,
+  veSystem,
 }: {
   walletProvider: Ref<
     | {
@@ -31,7 +32,7 @@ export const useController = ({
     | undefined
   >;
   network: Ref<NetworkConfig>;
-  address: string;
+  veSystem: Ref<VeSystem | undefined>;
 }): UseControllerReturnType => {
   const addAllowedRewardTokens = ref<DeployFunctionType>();
 
@@ -41,13 +42,16 @@ export const useController = ({
       callbacks: CallbackOptionsType
     ): Promise<void> => {
       if (!walletProvider.value) return;
+      if (!veSystem.value) return;
+
+      const contractAddress = veSystem.value.rewardDistributorAddress;
 
       const provider = new BrowserProvider(
         walletProvider.value,
         network.value.id
       );
       const signer = await provider.getSigner();
-      const contract = new ethers.Contract(address, ABI, signer);
+      const contract = new ethers.Contract(contractAddress, ABI, signer);
 
       await submitAction(
         async () => await contract.addAllowedRewardTokens(data),

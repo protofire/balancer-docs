@@ -5,8 +5,10 @@ import RewardsDistribution from './RewardsDistribution.vue';
 import AdminPools from './AdminPools.vue';
 import Wallet from '../../Navbar/Wallet.vue';
 import { useTabs, Tab } from '../../../providers/tabs';
+import { useVeSystem } from '../../../providers/veSystem';
 
 const { tab, select } = useTabs();
+const { selected: veSystem } = useVeSystem();
 </script>
 
 <template>
@@ -28,14 +30,22 @@ const { tab, select } = useTabs();
         Admin Pools
       </div>
       <div
-        :class="{ tab: true, 'active-tab': tab === Tab.VE_SYSTEM_CONFIG }"
-        @click="select(Tab.VE_SYSTEM_CONFIG)"
+        :class="{
+          tab: true,
+          'active-tab': tab === Tab.VE_SYSTEM_CONFIG && veSystem,
+          disabled: !veSystem,
+        }"
+        @click="veSystem && select(Tab.VE_SYSTEM_CONFIG)"
       >
         veSystem config
       </div>
       <div
-        :class="{ tab: true, 'active-tab': tab === Tab.REWARDS_DISTRIBUTION }"
-        @click="select(Tab.REWARDS_DISTRIBUTION)"
+        :class="{
+          tab: true,
+          'active-tab': tab === Tab.REWARDS_DISTRIBUTION && veSystem,
+          disabled: !veSystem,
+        }"
+        @click="veSystem && select(Tab.REWARDS_DISTRIBUTION)"
       >
         Rewards Distribution
       </div>
@@ -101,6 +111,10 @@ const { tab, select } = useTabs();
   height: 35px;
   cursor: pointer;
   font-weight: bold;
+}
+
+.tab.disabled {
+  cursor: not-allowed;
 }
 
 .tab.active-tab {
