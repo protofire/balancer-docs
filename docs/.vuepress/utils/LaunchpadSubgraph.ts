@@ -50,6 +50,21 @@ type GetVeSystemsResponse = {
   };
 };
 
+type GetVeSystemResponse = {
+  data: {
+    vesystem: RawVeSystem;
+  };
+};
+
+const format = (vesystem: RawVeSystem): VeSystem => ({
+  ...vesystem,
+  votingEscrow: {
+    ...vesystem.votingEscrow,
+    // TODO: lockedAmount: ethers.parseUnits(vesystem.votingEscrow.lockedAmount, vesystem.votingEscrow.decimals),
+    lockedAmount: ethers.parseEther(vesystem.votingEscrow.lockedAmount),
+  },
+});
+
 export class LaunchpadSubgraph {
   public client: ApolloClient<NormalizedCacheObject>;
 
@@ -87,13 +102,39 @@ export class LaunchpadSubgraph {
       data: { vesystems },
     } = (await this.client.query({ query })) as GetVeSystemsResponse;
 
-    return vesystems.map(vesystem => ({
-      ...vesystem,
-      votingEscrow: {
-        ...vesystem.votingEscrow,
-        // TODO: lockedAmount: ethers.parseUnits(vesystem.votingEscrow.lockedAmount, vesystem.votingEscrow.decimals),
-        lockedAmount: ethers.parseEther(vesystem.votingEscrow.lockedAmount),
-      },
-    }));
+    return vesystems.map(vesystem => format(vesystem));
+  }
+
+  public async getVeSystem(id: string): Promise<VeSystem> {
+    const query = gql(`
+      query GetVeSystem($id: String!) {
+        vesystem(id: $id) {
+          id
+          bptToken
+          bptTokenName
+          votingEscrow {
+            id
+            address
+            name
+            symbol
+            lockedAmount
+          }
+          rewardDistributor {
+            id
+            rewardTokens
+            rewardNames
+          }
+        }
+      }
+    `);
+
+    const {
+      data: { vesystem },
+    } = (await this.client.query({
+      query,
+      variables: { id },
+    })) as GetVeSystemResponse;
+
+    return format(vesystem);
   }
 }

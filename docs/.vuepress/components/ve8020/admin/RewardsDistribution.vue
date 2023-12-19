@@ -1,16 +1,19 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 
+const newReward = ref<string>();
 </script>
 
 <template>
   <form class="section-container">
-    <div key="bptAddress" class="item-row">
+    <div key="newReward" class="item-row">
       <p class="item-name">Set Available Rewards</p>
       <div class="input-group">
         <input
+          v-model="newReward"
           placeholder="0xa0b...6eb48"
           type="text"
-          name="bptAddress"
+          name="newReward"
           class="input"
         />
       </div>

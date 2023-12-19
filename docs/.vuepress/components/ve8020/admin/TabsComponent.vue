@@ -1,8 +1,12 @@
-<script setup>
+<script setup lang="ts">
 import Launchpad from '../Launchpad.vue';
 import Configuration from '../Configuration.vue';
 import RewardsDistribution from './RewardsDistribution.vue';
+import AdminPools from './AdminPools.vue';
 import Wallet from '../../Navbar/Wallet.vue';
+import { useTabs, Tab } from '../../../providers/tabs';
+
+const { tab, select } = useTabs();
 </script>
 
 <template>
@@ -12,63 +16,48 @@ import Wallet from '../../Navbar/Wallet.vue';
   <div class="main-container">
     <div class="head-container">
       <div
-        :class="{ tab: true, 'active-tab': activeTab === 1 }"
-        @click="showTab(1)"
+        :class="{ tab: true, 'active-tab': tab === Tab.LAUNCHPAD }"
+        @click="select(Tab.LAUNCHPAD)"
       >
         Launchpad
       </div>
       <div
-        :class="{ tab: true, 'active-tab': activeTab === 2 }"
-        @click="showTab(2)"
+        :class="{ tab: true, 'active-tab': tab === Tab.ADMIN_POOLS }"
+        @click="select(Tab.ADMIN_POOLS)"
       >
         Admin Pools
       </div>
       <div
-        :class="{ tab: true, 'active-tab': activeTab === 3 }"
-        @click="showTab(3)"
+        :class="{ tab: true, 'active-tab': tab === Tab.VE_SYSTEM_CONFIG }"
+        @click="select(Tab.VE_SYSTEM_CONFIG)"
       >
         veSystem config
       </div>
       <div
-        :class="{ tab: true, 'active-tab': activeTab === 4 }"
-        @click="showTab(4)"
+        :class="{ tab: true, 'active-tab': tab === Tab.REWARDS_DISTRIBUTION }"
+        @click="select(Tab.REWARDS_DISTRIBUTION)"
       >
         Rewards Distribution
       </div>
     </div>
 
-    <div v-show="activeTab === 1" class="body-container">
+    <div v-show="tab === Tab.LAUNCHPAD" class="body-container">
       <Launchpad />
     </div>
 
-    <div v-show="activeTab === 2" class="body-container">
-      <p>Admin Pools</p>
+    <div v-show="tab === Tab.ADMIN_POOLS" class="body-container">
+      <AdminPools />
     </div>
 
-    <div v-show="activeTab === 3" class="body-container">
+    <div v-show="tab === Tab.VE_SYSTEM_CONFIG" class="body-container">
       <Configuration />
     </div>
 
-    <div v-show="activeTab === 4" class="body-container">
+    <div v-show="tab === Tab.REWARDS_DISTRIBUTION" class="body-container">
       <RewardsDistribution />
     </div>
   </div>
 </template>
-
-<script>
-export default {
-  data() {
-    return {
-      activeTab: 1,
-    };
-  },
-  methods: {
-    showTab(tabNumber) {
-      this.activeTab = tabNumber;
-    },
-  },
-};
-</script>
 
 <style scoped>
 .network-select {
