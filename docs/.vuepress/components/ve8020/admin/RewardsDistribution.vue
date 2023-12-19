@@ -4,10 +4,11 @@ import { useWeb3ModalProvider } from '@web3modal/ethers/vue';
 import { useNetwork } from '../../../providers/network';
 import { useController } from '../../../utils/RewardsDistributionController';
 import { useVeSystem } from '../../../providers/veSystem';
+import { ethers, toBigInt } from 'ethers';
 
 const newReward = ref<string | undefined>();
-const currentWeek = ref<string>();
-const amountCurrentWeek = ref<number>();
+const currentWeekToken = ref<string>();
+const currentWeekAmount = ref<number>();
 const nWeek = ref<string>();
 const amountNWeek = ref<number>();
 const weeks = ref<number>();
@@ -20,7 +21,7 @@ const { walletProvider } = useWeb3ModalProvider();
 
 const { selected: veSystem } = useVeSystem();
 const { network } = useNetwork();
-const { addAllowedRewardTokens } = useController({
+const { addAllowedRewardTokens, tokenAllowance } = useController({
   walletProvider,
   network,
   veSystem,
@@ -46,6 +47,19 @@ const handleSetAvailableReward = async (address: string) => {
       isLoading.value = false;
     },
   });
+};
+
+const handleAddRewardsCurrentWeek = async (token: string, amount: number) => {
+  isLoading.value = true;
+  const allowance = await tokenAllowance.value?.(token);
+  isLoading.value = false;
+  if (allowance === undefined) return;
+
+  if (allowance < toBigInt(amount)) {
+    alert('not enough allowance');
+  }
+
+  console.log('allowance: ', ethers.formatEther(allowance));
 };
 </script>
 
@@ -77,21 +91,35 @@ const handleSetAvailableReward = async (address: string) => {
       <div class="item-action">
         <div class="input-group current-week">
           <input
-            v-model="currentWeek"
+            v-model="currentWeekToken"
             placeholder="Token address (0xab...)"
             type="text"
-            name="currentWeek"
+            name="currentWeekToken"
             class="input"
           />
         </div>
         <input
-          v-model="amountCurrentWeek"
+          v-model="currentWeekAmount"
           placeholder="Amount"
           type="number"
-          name="amountCurrentWeek"
+          name="currentWeekAmount"
           class="input-amount"
         />
-        <button class="submit-button">Add</button>
+        <button
+          class="submit-button"
+          :disabled="
+            currentWeekToken === undefined ||
+            currentWeekAmount === undefined ||
+            isLoading
+          "
+          @click="
+            currentWeekToken &&
+              currentWeekAmount &&
+              handleAddRewardsCurrentWeek(currentWeekToken, currentWeekAmount)
+          "
+        >
+          Add
+        </button>
       </div>
     </div>
     <div key="nWeek" class="item-row">
