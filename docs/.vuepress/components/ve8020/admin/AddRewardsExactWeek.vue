@@ -1,23 +1,54 @@
 <script setup lang="ts">
-import SetAvailableRewardsForm from './SetAvailableRewardsForm.vue';
-import AddRewardsCurrentWeek from './AddRewardsCurrentWeek.vue';
-import AddRewardsNWeeks from './AddRewardsNWeeks.vue';
-import AddRewardsExactWeek from './AddRewardsExactWeek.vue';
+import { ref } from 'vue';
+
+const token = ref<string>('');
+const amount = ref<string>('');
+const week = ref<string>('');
 </script>
 
 <template>
-  <div class="section-container">
-    <SetAvailableRewardsForm />
-    <AddRewardsCurrentWeek />
-    <AddRewardsNWeeks />
-    <AddRewardsExactWeek />
-  </div>
-  <div class="btn-group">
-    <button class="available-button">Available Rewards</button>
+  <div key="exactWeek" class="item-row">
+    <p class="item-name">Add Rewards into Exact Week</p>
+    <div class="item-action">
+      <div class="input-group calendar-group">
+        <input
+          v-model="token"
+          placeholder="0xa0b...6eb48"
+          type="text"
+          class="input"
+        />
+      </div>
+      <input
+        v-model="amount"
+        placeholder="Amount"
+        type="number"
+        class="input-amount"
+      />
+      <div class="input-group calendar-container">
+        <p class="title-input">calendar</p>
+        <input
+          v-model="week"
+          placeholder="2023/30/11"
+          type="date"
+          class="input"
+        />
+      </div>
+      <button class="submit-button">Add</button>
+    </div>
   </div>
 </template>
 
 <style scoped>
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
 .section-container {
   display: flex;
   flex-direction: column;

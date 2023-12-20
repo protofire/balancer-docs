@@ -1,23 +1,49 @@
 <script setup lang="ts">
-import SetAvailableRewardsForm from './SetAvailableRewardsForm.vue';
-import AddRewardsCurrentWeek from './AddRewardsCurrentWeek.vue';
-import AddRewardsNWeeks from './AddRewardsNWeeks.vue';
-import AddRewardsExactWeek from './AddRewardsExactWeek.vue';
+import { ref } from 'vue';
+
+const token = ref<string>('');
+const amount = ref<string>('');
+const weeks = ref<string>('');
 </script>
 
 <template>
-  <div class="section-container">
-    <SetAvailableRewardsForm />
-    <AddRewardsCurrentWeek />
-    <AddRewardsNWeeks />
-    <AddRewardsExactWeek />
-  </div>
-  <div class="btn-group">
-    <button class="available-button">Available Rewards</button>
+  <div key="nWeek" class="item-row">
+    <p class="item-name">Add Rewards into N Weeks</p>
+    <div class="item-action">
+      <div class="input-group n-week">
+        <input
+          v-model="token"
+          placeholder="Token address (0xab...)"
+          type="text"
+          class="input"
+        />
+      </div>
+      <input
+        v-model="amount"
+        placeholder="Amount"
+        type="number"
+        class="input-amount"
+      />
+      <div class="input-group weeks-container">
+        <p class="title-input">weeks</p>
+        <input v-model="weeks" placeholder="10" type="number" class="input" />
+      </div>
+      <button class="submit-button">Add</button>
+    </div>
   </div>
 </template>
 
 <style scoped>
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
 .section-container {
   display: flex;
   flex-direction: column;
