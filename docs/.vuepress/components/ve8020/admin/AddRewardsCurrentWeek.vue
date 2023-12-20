@@ -1,87 +1,120 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import SetAvailableRewardsForm from './SetAvailableRewardsForm.vue';
-import AddRewardsCurrentWeek from './AddRewardsCurrentWeek.vue';
+import { ref, watch, computed } from 'vue';
+import { useWeb3ModalProvider } from '@web3modal/ethers/vue';
+import { useNetwork } from '../../../providers/network';
+import { useController } from '../../../utils/RewardsDistributionController';
+import { useVeSystem } from '../../../providers/veSystem';
+import { ethers, toBigInt } from 'ethers';
 
-const nWeek = ref<string>();
-const amountNWeek = ref<number>();
-const weeks = ref<number>();
-const exactWeek = ref<string>();
-const amountExactWeek = ref<number>();
-const calendar = ref<number>();
+const { walletProvider } = useWeb3ModalProvider();
+const { selected: veSystem } = useVeSystem();
+const { network } = useNetwork();
+const { tokenAllowance, approveToken } = useController({
+  walletProvider,
+  network,
+  veSystem,
+});
+
+const token = ref<string>('');
+const inputAmount = ref<string>('');
+const allowance = ref<bigint>(toBigInt(0));
+const isLoading = ref<boolean>(false);
+
+const amount = computed<bigint>(() => {
+  if (inputAmount.value === '') return toBigInt(0);
+
+  return ethers.parseEther(inputAmount.value.toString());
+});
+
+const isAllowanceEnough = computed<boolean>(
+  () => allowance.value > amount.value
+);
+
+const showApprove = computed<boolean>(
+  () =>
+    inputAmount.value !== '' && token.value !== '' && !isAllowanceEnough.value
+);
+
+watch(token, async value => {
+  if (value === '') return;
+
+  const tokenAllowanceResult = await tokenAllowance.value?.(value);
+
+  allowance.value = tokenAllowanceResult || toBigInt(0);
+});
+
+watch(amount, value => console.log('amount: ', value));
+
+const handleSubmit = () => {
+  console.log('submit');
+};
+
+const clearForm = () => {
+  inputAmount.value = '';
+  token.value = '';
+};
+
+const handleApprove = async () => {
+  await approveToken.value?.(
+    { token: token.value, amount: amount.value },
+    {
+      onPrompt: () => {
+        console.log('prompt');
+        isLoading.value = true;
+      },
+      onSubmitted: ({ tx }) => {
+        console.log('submitted', tx);
+      },
+      onSuccess: ({ receipt }) => {
+        console.log('success', receipt);
+        isLoading.value = false;
+        clearForm();
+      },
+      onError: err => {
+        console.log('err', err);
+        isLoading.value = false;
+        clearForm();
+      },
+    }
+  );
+};
 </script>
 
 <template>
-  <div class="section-container">
-    <SetAvailableRewardsForm />
-    <AddRewardsCurrentWeek />
-    <div key="nWeek" class="item-row">
-      <p class="item-name">Add Rewards into N Weeks</p>
-      <div class="item-action">
-        <div class="input-group n-week">
-          <input
-            v-model="nWeek"
-            placeholder="Token address (0xab...)"
-            type="text"
-            name="nWeek"
-            class="input"
-          />
-        </div>
+  <div key="currentWeek" class="item-row">
+    <p class="item-name">Add Rewards into Current Week</p>
+    <div class="item-action">
+      <div class="input-group current-week">
         <input
-          v-model="amountNWeek"
-          placeholder="Amount"
-          type="number"
-          name="amountNWeek"
-          class="input-amount"
+          v-model="token"
+          placeholder="Token address (0xab...)"
+          type="text"
+          class="input"
         />
-        <div class="input-group weeks-container">
-          <p class="title-input">weeks</p>
-          <input
-            v-model="weeks"
-            placeholder="10"
-            type="number"
-            name="weeks"
-            class="input"
-          />
-        </div>
-        <button class="submit-button">Add</button>
       </div>
+      <input
+        v-model="inputAmount"
+        placeholder="Amount"
+        type="number"
+        class="input-amount"
+      />
+      <button
+        v-show="!showApprove"
+        class="submit-button"
+        :disabled="token === '' || inputAmount === '' || isLoading"
+        @click="handleSubmit()"
+      >
+        Add
+      </button>
+      <button
+        v-show="showApprove"
+        class="submit-button"
+        :disabled="isLoading"
+        @click="handleApprove()"
+      >
+        Approve
+      </button>
     </div>
-    <div key="exactWeek" class="item-row">
-      <p class="item-name">Add Rewards into Exact Week</p>
-      <div class="item-action">
-        <div class="input-group calendar-group">
-          <input
-            v-model="exactWeek"
-            placeholder="0xa0b...6eb48"
-            type="text"
-            name="exactWeek"
-            class="input"
-          />
-        </div>
-        <input
-          v-model="amountExactWeek"
-          placeholder="Amount"
-          type="number"
-          name="amountExactWeek"
-          class="input-amount"
-        />
-        <div class="input-group calendar-container">
-          <p class="title-input">calendar</p>
-          <input
-            v-model="calendar"
-            placeholder="2023/30/11"
-            type="date"
-            name="calendar"
-            class="input"
-          />
-        </div>
-        <button class="submit-button">Add</button>
-      </div>
-    </div>
-  </div>
-  <div class="btn-group">
-    <button class="available-button">Available Rewards</button>
   </div>
 </template>
 

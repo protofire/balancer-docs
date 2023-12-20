@@ -16,7 +16,7 @@ type DepositTokenFunctionType = (
 
 type ApproveTokenParamsType = {
   token: string;
-  amount: number;
+  amount: bigint;
 };
 
 type TokenAllowanceFunctionType = (token: string) => Promise<bigint>;
