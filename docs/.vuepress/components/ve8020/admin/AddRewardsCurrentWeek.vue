@@ -10,7 +10,7 @@ import Selector from './Selector.vue';
 const { walletProvider } = useWeb3ModalProvider();
 const { selected: veSystem } = useVeSystem();
 const { network } = useNetwork();
-const { tokenAllowance, approveToken } = useController({
+const { tokenAllowance, approveToken, depositToken } = useController({
   walletProvider,
   network,
   veSystem,
@@ -46,8 +46,31 @@ watch(token, async value => {
 
 watch(amount, value => console.log('amount: ', value));
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
   console.log('submit');
+
+  await depositToken.value?.(
+    { token: token.value, amount: amount.value },
+    {
+      onPrompt: () => {
+        console.log('prompt');
+        isLoading.value = true;
+      },
+      onSubmitted: ({ tx }) => {
+        console.log('submitted', tx);
+      },
+      onSuccess: ({ receipt }) => {
+        console.log('success', receipt);
+        isLoading.value = false;
+        clearForm();
+      },
+      onError: err => {
+        console.log('err', err);
+        isLoading.value = false;
+        clearForm();
+      },
+    }
+  );
 };
 
 const clearForm = () => {
@@ -69,12 +92,10 @@ const handleApprove = async () => {
       onSuccess: ({ receipt }) => {
         console.log('success', receipt);
         isLoading.value = false;
-        clearForm();
       },
       onError: err => {
         console.log('err', err);
         isLoading.value = false;
-        clearForm();
       },
     }
   );

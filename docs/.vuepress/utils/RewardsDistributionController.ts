@@ -9,22 +9,20 @@ type AddAllowedRewardTokensFunctionType = (
   callbacks: CallbackOptionsType
 ) => Promise<void>;
 
-type DepositTokenFunctionType = (
-  token: string,
-  callbacks: CallbackOptionsType
-) => Promise<void>;
-
-type ApproveTokenParamsType = {
+type DepositTokenParamsType = {
   token: string;
   amount: bigint;
 };
 
-type TokenAllowanceFunctionType = (token: string) => Promise<bigint>;
-
-type ApproveTokenFunctionType = (
-  data: ApproveTokenParamsType,
+type DepositTokenFunctionType = (
+  data: DepositTokenParamsType,
   callbacks: CallbackOptionsType
 ) => Promise<void>;
+
+type ApproveTokenParamsType = DepositTokenParamsType;
+type ApproveTokenFunctionType = DepositTokenFunctionType;
+
+type TokenAllowanceFunctionType = (token: string) => Promise<bigint>;
 
 type UseControllerReturnType = {
   addAllowedRewardTokens: Ref<AddAllowedRewardTokensFunctionType | undefined>;
@@ -40,7 +38,7 @@ const ERC20 = [
 
 const ABI = [
   'function addAllowedRewardTokens(address[] calldata tokens) external',
-  'function depositToken(ERC20 token, uint256 amount) external',
+  'function depositToken(address token, uint256 amount) external',
 ];
 
 export const useController = ({
@@ -89,7 +87,7 @@ export const useController = ({
     };
 
     depositToken.value = async (
-      token: string,
+      data: DepositTokenParamsType,
       callbacks: CallbackOptionsType
     ): Promise<void> => {
       if (!walletProvider.value) return;
@@ -104,8 +102,10 @@ export const useController = ({
       const signer = await provider.getSigner();
       const contract = new ethers.Contract(contractAddress, ABI, signer);
 
+      const { token, amount } = data;
+
       await submitAction(
-        async () => await contract.depositToken(token),
+        async () => await contract.depositToken(token, amount),
         callbacks
       );
     };
