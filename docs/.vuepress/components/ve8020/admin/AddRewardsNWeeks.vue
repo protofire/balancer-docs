@@ -1,17 +1,120 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed, watch } from 'vue';
+import Selector from './Selector.vue';
+import { useWeb3ModalProvider } from '@web3modal/ethers/vue';
+import { useNetwork } from '../../../providers/network';
+import { useController } from '../../../utils/RewardsDistributionController';
+import { useVeSystem } from '../../../providers/veSystem';
+import { toBigInt, ethers } from 'ethers';
 
-import Selector, { ItemType } from './Selector.vue';
+const { walletProvider } = useWeb3ModalProvider();
+const { selected: veSystem } = useVeSystem();
+const { network } = useNetwork();
+const { tokenAllowance, approveToken, depositEqualWeeksPeriod } = useController(
+  {
+    walletProvider,
+    network,
+    veSystem,
+  }
+);
 
 const token = ref<string>('');
-const amount = ref<string>('');
-const weeks = ref<string>('');
+const inputAmount = ref<string>('');
+const weeksInput = ref<string>('');
+const allowance = ref<bigint>(toBigInt(0));
+const isLoading = ref<boolean>(false);
 
-const tokens: ItemType[] = [
-  ['1', 'Token 1'],
-  ['2', 'Token 2'],
-  ['3', 'Token 3'],
-];
+const amount = computed<bigint>(() => {
+  if (inputAmount.value === '') return toBigInt(0);
+
+  return ethers.parseEther(inputAmount.value.toString());
+});
+
+const weeks = computed<bigint>(() => {
+  if (weeksInput.value === '') return toBigInt(0);
+
+  return toBigInt(weeksInput.value);
+});
+
+const isAllowanceEnough = computed<boolean>(
+  () => allowance.value >= amount.value
+);
+
+const showApprove = computed<boolean>(
+  () =>
+    inputAmount.value !== '' && token.value !== '' && !isAllowanceEnough.value
+);
+
+watch(token, async value => {
+  if (value === '') return;
+
+  const tokenAllowanceResult = await tokenAllowance.value?.(value);
+
+  allowance.value = tokenAllowanceResult || toBigInt(0);
+});
+
+const handleSubmit = async () => {
+  await depositEqualWeeksPeriod.value?.(
+    { token: token.value, amount: amount.value, weeks: weeks.value },
+    {
+      onPrompt: () => {
+        console.log('prompt');
+        isLoading.value = true;
+      },
+      onSubmitted: ({ tx }) => {
+        console.log('submitted', tx);
+      },
+      onSuccess: ({ receipt }) => {
+        console.log('success', receipt);
+        isLoading.value = false;
+        clearForm();
+      },
+      onError: err => {
+        console.log('err', err);
+        isLoading.value = false;
+        clearForm();
+      },
+    }
+  );
+};
+
+const clearForm = () => {
+  inputAmount.value = '';
+  token.value = '';
+  weeksInput.value = '';
+};
+
+const handleApprove = async () => {
+  await approveToken.value?.(
+    { token: token.value, amount: amount.value },
+    {
+      onPrompt: () => {
+        console.log('prompt');
+        isLoading.value = true;
+      },
+      onSubmitted: ({ tx }) => {
+        console.log('submitted', tx);
+      },
+      onSuccess: ({ receipt }) => {
+        console.log('success', receipt);
+        isLoading.value = false;
+      },
+      onError: err => {
+        console.log('err', err);
+        isLoading.value = false;
+      },
+    }
+  );
+};
+
+const tokens = computed<[string, string][]>(() => {
+  if (veSystem.value === undefined) return [];
+
+  const addresses = veSystem.value.rewardDistributor.rewardTokens;
+  const names = veSystem.value.rewardDistributor.rewardNames;
+
+  return addresses.map((address, index) => [address, names[index]]);
+});
 </script>
 
 <template>
@@ -25,16 +128,38 @@ const tokens: ItemType[] = [
         :onChange="value => (token = value)"
       />
       <input
-        v-model="amount"
+        v-model="inputAmount"
         placeholder="Amount"
         type="number"
         class="input-amount"
       />
       <div class="input-group weeks-container">
         <p class="title-input">weeks</p>
-        <input v-model="weeks" placeholder="10" type="number" class="input" />
+        <input
+          v-model="weeksInput"
+          placeholder="10"
+          type="number"
+          class="input"
+        />
       </div>
-      <button class="submit-button">Add</button>
+      <button
+        v-show="!showApprove"
+        :disabled="
+          token === '' || inputAmount === '' || weeksInput === '' || isLoading
+        "
+        class="submit-button"
+        @click="handleSubmit"
+      >
+        Add
+      </button>
+      <button
+        v-show="showApprove"
+        :disabled="isLoading"
+        class="submit-button"
+        @click="handleApprove"
+      >
+        Approve
+      </button>
     </div>
   </div>
 </template>

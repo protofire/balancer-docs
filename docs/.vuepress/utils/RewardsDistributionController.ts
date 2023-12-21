@@ -29,7 +29,19 @@ type UseControllerReturnType = {
   depositToken: Ref<DepositTokenFunctionType | undefined>;
   approveToken: Ref<ApproveTokenFunctionType | undefined>;
   tokenAllowance: Ref<TokenAllowanceFunctionType | undefined>;
+  depositEqualWeeksPeriod: Ref<DepositEqualWeeksPeriodFunctionType | undefined>;
 };
+
+type DepositEqualWeeksPeriodParamsType = {
+  token: string;
+  amount: bigint;
+  weeks: bigint;
+};
+
+type DepositEqualWeeksPeriodFunctionType = (
+  data: DepositEqualWeeksPeriodParamsType,
+  callbacks: CallbackOptionsType
+) => Promise<void>;
 
 const ERC20 = [
   'function approve(address spender, uint256 amount) external returns (bool)',
@@ -39,6 +51,10 @@ const ERC20 = [
 const ABI = [
   'function addAllowedRewardTokens(address[] calldata tokens) external',
   'function depositToken(address token, uint256 amount) external',
+];
+
+const RewardFaucetABI = [
+  'function depositEqualWeeksPeriod(address token, uint256 amount, uint256 weeksCount) external',
 ];
 
 export const useController = ({
@@ -62,6 +78,7 @@ export const useController = ({
   const depositToken = ref<DepositTokenFunctionType>();
   const approveToken = ref<ApproveTokenFunctionType>();
   const tokenAllowance = ref<TokenAllowanceFunctionType>();
+  const depositEqualWeeksPeriod = ref<DepositEqualWeeksPeriodFunctionType>();
 
   const initialize = () => {
     addAllowedRewardTokens.value = async (
@@ -152,6 +169,36 @@ export const useController = ({
       const contract = new ethers.Contract(token, ERC20, provider);
 
       return await contract.allowance(owner, spender);
+    };
+
+    depositEqualWeeksPeriod.value = async (
+      data: DepositEqualWeeksPeriodParamsType,
+      callbacks: CallbackOptionsType
+    ): Promise<void> => {
+      if (!walletProvider.value) return;
+      if (!veSystem.value) return;
+
+      // TODO: Add this field to the subgraph
+      const contractAddress = veSystem.value.rewardFaucetAddress;
+
+      const provider = new BrowserProvider(
+        walletProvider.value,
+        network.value.id
+      );
+      const signer = await provider.getSigner();
+      const contract = new ethers.Contract(
+        contractAddress,
+        RewardFaucetABI,
+        signer
+      );
+
+      const { token, amount, weeks } = data;
+
+      await submitAction(
+        async () =>
+          await contract.depositEqualWeeksPeriod(token, amount, weeks),
+        callbacks
+      );
     };
   };
 
