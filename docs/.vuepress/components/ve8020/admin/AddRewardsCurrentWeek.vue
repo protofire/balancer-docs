@@ -28,7 +28,7 @@ const amount = computed<bigint>(() => {
 });
 
 const isAllowanceEnough = computed<boolean>(
-  () => allowance.value > amount.value
+  () => allowance.value >= amount.value
 );
 
 const showApprove = computed<boolean>(
