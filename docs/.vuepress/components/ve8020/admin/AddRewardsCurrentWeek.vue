@@ -5,6 +5,7 @@ import { useNetwork } from '../../../providers/network';
 import { useController } from '../../../utils/RewardsDistributionController';
 import { useVeSystem } from '../../../providers/veSystem';
 import { ethers, toBigInt } from 'ethers';
+import Selector from './Selector.vue';
 
 const { walletProvider } = useWeb3ModalProvider();
 const { selected: veSystem } = useVeSystem();
@@ -78,46 +79,27 @@ const handleApprove = async () => {
     }
   );
 };
-const isDropdownOpen = ref(false);
-const toggleDropdown = () => {
-  isDropdownOpen.value = !isDropdownOpen.value;
-};
-const selectToken = (selectedToken: string) => {
-  token.value = selectedToken;
-};
-const tokens = ['Token 1', 'Token 2', 'Token 3'];
+
+const tokens = computed<[string, string][]>(() => {
+  if (veSystem.value === undefined) return [];
+
+  const addresses = veSystem.value.rewardDistributor.rewardTokens;
+  const names = veSystem.value.rewardDistributor.rewardNames;
+
+  return addresses.map((address, index) => [address, names[index]]);
+});
 </script>
 
 <template>
   <div key="currentWeek" class="item-row">
     <p class="item-name">Add Rewards into Current Week</p>
     <div class="item-action">
-      <div class="current-week" @click="toggleDropdown">
-        <div class="selected-token">
-          <p v-if="token === ''" class="value">Select Token</p>
-          <p v-else class="value">{{ token }}</p>
-          <svg
-            width="14"
-            height="14"
-            :class="{
-              icon: true,
-              open: isDropdownOpen,
-            }"
-          >
-            <use href="/images/caret-down-fill.svg#icon"></use>
-          </svg>
-        </div>
-        <div v-if="isDropdownOpen" class="token-list">
-          <p
-            v-for="(tokenOption, index) in tokens"
-            :key="index"
-            class="value"
-            @click="selectToken(tokenOption)"
-          >
-            {{ tokenOption }}
-          </p>
-        </div>
-      </div>
+      <Selector
+        prompt="Select Token"
+        :items="tokens"
+        :selected="token"
+        :onChange="value => (token = value)"
+      />
       <input
         v-model="inputAmount"
         placeholder="Amount"
