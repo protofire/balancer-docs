@@ -107,8 +107,7 @@ input[type='number'] {
   width: calc(100% - 70px);
 }
 
-.item-row .input-group .input,
-.item-row .item-action .input-amount {
+.item-row .input-group .input {
   background-color: transparent;
   border: 1px solid #e2e8f0;
   position: relative;
@@ -122,13 +121,11 @@ input[type='number'] {
   align-items: center;
 }
 
-.dark .item-row .input-group .input,
-.dark .item-row .item-action .input-amount {
+.dark .item-row .input-group .input {
   border: 1px solid #3e4c5a;
 }
 
-.item-row .input-group .input:focus,
-.dark .item-row .item-action .input-amount:focus {
+.item-row .input-group .input:focus {
   border: 1px solid #384aff;
 }
 
@@ -143,15 +140,6 @@ input[type='number'] {
   font-size: 14px;
   box-shadow: none;
   border: none;
-}
-.btn-group {
-  margin-top: 30px;
-  display: flex;
-  width: 100%;
-  align-items: center;
-  justify-content: flex-end;
-  max-width: 700px;
-  height: 45px;
 }
 
 .dark .submit-button {
