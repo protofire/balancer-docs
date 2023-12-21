@@ -1,23 +1,29 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
+import Selector, { ItemType } from './Selector.vue';
+
 const token = ref<string>('');
 const amount = ref<string>('');
 const weeks = ref<string>('');
+
+const tokens: ItemType[] = [
+  ['1', 'Token 1'],
+  ['2', 'Token 2'],
+  ['3', 'Token 3'],
+];
 </script>
 
 <template>
   <div key="nWeek" class="item-row">
     <p class="item-name">Add Rewards into N Weeks</p>
     <div class="item-action">
-      <div class="input-group n-week">
-        <input
-          v-model="token"
-          placeholder="Token address (0xab...)"
-          type="text"
-          class="input"
-        />
-      </div>
+      <Selector
+        :items="tokens"
+        :selected="token"
+        prompt="Select Token"
+        :onChange="value => (token = value)"
+      />
       <input
         v-model="amount"
         placeholder="Amount"

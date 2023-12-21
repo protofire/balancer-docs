@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, defineProps, computed } from 'vue';
 
-type ItemType = [string, string]; // id - name
+export type ItemType = [string, string]; // id - name
 
 type SelectorPropsType = {
   prompt: string;
