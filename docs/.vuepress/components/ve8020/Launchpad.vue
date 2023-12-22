@@ -3,7 +3,7 @@ import { ref, watch, computed } from 'vue';
 import Calendar from './Calendar.vue';
 import { useWeb3ModalProvider } from '@web3modal/ethers/vue';
 import { useNetwork } from '../../providers/network';
-import { useController } from '../../utils';
+import { useController, weeksToSeconds } from '../../utils';
 
 const { network } = useNetwork();
 const { walletProvider } = useWeb3ModalProvider();
@@ -34,8 +34,6 @@ const handleClickContainer = () => {
 const closeCalendar = () => {
   openCalendar.value = false;
 };
-
-const weeksToSeconds = (weeks: number) => weeks * 7 * 24 * 60 * 60;
 
 const date = new Date();
 const formatedDate = (date: Date) => {

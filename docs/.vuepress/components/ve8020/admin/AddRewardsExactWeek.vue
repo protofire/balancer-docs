@@ -1,16 +1,126 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import Selector, { ItemType } from './Selector.vue';
+import { ref, computed, watch } from 'vue';
+import Selector from './Selector.vue';
+import { useWeb3ModalProvider } from '@web3modal/ethers/vue';
+import { useNetwork } from '../../../providers/network';
+import { useController } from '../../../utils/RewardFaucetController';
+import { useVeSystem } from '../../../providers/veSystem';
+import { toBigInt, ethers } from 'ethers';
+import { weeksToSeconds } from '../../../utils';
+
+const { walletProvider } = useWeb3ModalProvider();
+const { selected: veSystem } = useVeSystem();
+const { network } = useNetwork();
+const { tokenAllowance, approveToken, depositExactWeek } = useController({
+  walletProvider,
+  network,
+  veSystem,
+});
 
 const token = ref<string>('');
-const amount = ref<string>('');
-const week = ref<string>('');
+const amountInput = ref<string>('');
+const weekInput = ref<string>('');
+const allowance = ref<bigint>(toBigInt(0));
+const isLoading = ref<boolean>(false);
 
-const tokens: ItemType[] = [
-  ['1', 'Token 1'],
-  ['2', 'Token 2'],
-  ['3', 'Token 3'],
-];
+const amount = computed<bigint>(() => {
+  if (amountInput.value === '') return toBigInt(0);
+
+  return ethers.parseEther(amountInput.value.toString());
+});
+
+const week = computed<bigint>(() => {
+  if (weekInput.value === '') return toBigInt(0);
+
+  return toBigInt(weeksToSeconds(parseInt(weekInput.value)));
+});
+
+const isAllowanceEnough = computed<boolean>(
+  () => allowance.value >= amount.value
+);
+
+const showApprove = computed<boolean>(
+  () =>
+    amountInput.value !== '' && token.value !== '' && !isAllowanceEnough.value
+);
+
+const fetchAllowance = async () => {
+  const tokenAllowanceResult = await tokenAllowance.value?.(token.value);
+
+  console.log('allowance: ', tokenAllowanceResult);
+
+  allowance.value = tokenAllowanceResult || toBigInt(0);
+};
+
+watch(token, async value => {
+  if (value === '') return;
+
+  await fetchAllowance();
+});
+
+const handleSubmit = async () => {
+  await depositExactWeek.value?.(
+    { token: token.value, amount: amount.value, weekTimestamp: week.value },
+    {
+      onPrompt: () => {
+        console.log('prompt');
+        isLoading.value = true;
+      },
+      onSubmitted: ({ tx }) => {
+        console.log('submitted', tx);
+      },
+      onSuccess: ({ receipt }) => {
+        console.log('success', receipt);
+        isLoading.value = false;
+        clearForm();
+      },
+      onError: err => {
+        console.log('err', err);
+        isLoading.value = false;
+        clearForm();
+      },
+    }
+  );
+};
+
+const clearForm = () => {
+  amountInput.value = '';
+  token.value = '';
+  weekInput.value = '';
+};
+
+const handleApprove = async () => {
+  await approveToken.value?.(
+    { token: token.value, amount: amount.value },
+    {
+      onPrompt: () => {
+        console.log('prompt');
+        isLoading.value = true;
+      },
+      onSubmitted: ({ tx }) => {
+        console.log('submitted', tx);
+      },
+      onSuccess: async ({ receipt }) => {
+        console.log('success', receipt);
+        isLoading.value = false;
+        await fetchAllowance();
+      },
+      onError: err => {
+        console.log('err', err);
+        isLoading.value = false;
+      },
+    }
+  );
+};
+
+const tokens = computed<[string, string][]>(() => {
+  if (veSystem.value === undefined) return [];
+
+  const addresses = veSystem.value.rewardDistributor.rewardTokens;
+  const names = veSystem.value.rewardDistributor.rewardNames;
+
+  return addresses.map((address, index) => [address, names[index]]);
+});
 </script>
 
 <template>
@@ -24,7 +134,7 @@ const tokens: ItemType[] = [
         :onChange="value => (token = value)"
       />
       <input
-        v-model="amount"
+        v-model="amountInput"
         placeholder="Amount"
         type="number"
         class="input-amount"
@@ -32,13 +142,30 @@ const tokens: ItemType[] = [
       <div class="input-group calendar-container">
         <p class="title-input">calendar</p>
         <input
-          v-model="week"
+          v-model="weekInput"
           placeholder="2023/30/11"
           type="date"
           class="input"
         />
       </div>
-      <button class="submit-button">Add</button>
+      <button
+        v-show="!showApprove"
+        :disabled="
+          token === '' || amountInput === '' || weekInput === '' || isLoading
+        "
+        class="submit-button"
+        @click="handleSubmit"
+      >
+        Add
+      </button>
+      <button
+        v-show="showApprove"
+        :disabled="isLoading"
+        class="submit-button"
+        @click="handleApprove"
+      >
+        Approve
+      </button>
     </div>
   </div>
 </template>

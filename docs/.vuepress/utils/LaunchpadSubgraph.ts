@@ -27,6 +27,7 @@ export type VeSystem = {
   votingEscrow: VotingEscrow;
   rewardDistributor: RewardDistributor;
   rewardDistributorAddress: string;
+  rewardFaucetAddress: string;
 };
 
 type RawVotingEscrow = {
@@ -44,6 +45,7 @@ type RawVeSystem = {
   votingEscrow: RawVotingEscrow;
   rewardDistributor: RewardDistributor;
   rewardDistributorAddress: string;
+  rewardFaucetAddress: string;
 };
 
 type GetVeSystemsResponse = {
@@ -92,6 +94,7 @@ export class LaunchpadSubgraph {
             lockedAmount
           }
           rewardDistributorAddress
+          rewardFaucetAddress
           rewardDistributor {
             id
             rewardTokens
@@ -122,6 +125,7 @@ export class LaunchpadSubgraph {
             symbol
             lockedAmount
           }
+          rewardFaucetAddress
           rewardDistributorAddress
           rewardDistributor {
             id

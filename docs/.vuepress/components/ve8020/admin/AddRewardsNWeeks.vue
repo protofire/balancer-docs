@@ -3,7 +3,7 @@ import { ref, computed, watch } from 'vue';
 import Selector from './Selector.vue';
 import { useWeb3ModalProvider } from '@web3modal/ethers/vue';
 import { useNetwork } from '../../../providers/network';
-import { useController } from '../../../utils/RewardsDistributionController';
+import { useController } from '../../../utils/RewardFaucetController';
 import { useVeSystem } from '../../../providers/veSystem';
 import { toBigInt, ethers } from 'ethers';
 
@@ -45,12 +45,18 @@ const showApprove = computed<boolean>(
     inputAmount.value !== '' && token.value !== '' && !isAllowanceEnough.value
 );
 
+const fetchAllowance = async () => {
+  const tokenAllowanceResult = await tokenAllowance.value?.(token.value);
+
+  console.log('allowance: ', tokenAllowanceResult);
+
+  allowance.value = tokenAllowanceResult || toBigInt(0);
+};
+
 watch(token, async value => {
   if (value === '') return;
 
-  const tokenAllowanceResult = await tokenAllowance.value?.(value);
-
-  allowance.value = tokenAllowanceResult || toBigInt(0);
+  await fetchAllowance();
 });
 
 const handleSubmit = async () => {
@@ -95,9 +101,10 @@ const handleApprove = async () => {
       onSubmitted: ({ tx }) => {
         console.log('submitted', tx);
       },
-      onSuccess: ({ receipt }) => {
+      onSuccess: async ({ receipt }) => {
         console.log('success', receipt);
         isLoading.value = false;
+        await fetchAllowance();
       },
       onError: err => {
         console.log('err', err);

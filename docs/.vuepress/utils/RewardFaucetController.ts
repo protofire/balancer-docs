@@ -4,11 +4,6 @@ import { NetworkConfig } from '../constants/networks';
 import { CallbackOptionsType, submitAction } from './LaunchpadController';
 import { VeSystem } from './LaunchpadSubgraph';
 
-type AddAllowedRewardTokensFunctionType = (
-  data: string[],
-  callbacks: CallbackOptionsType
-) => Promise<void>;
-
 type DepositTokenParamsType = {
   token: string;
   amount: bigint;
@@ -47,8 +42,6 @@ type DepositExactWeekFunctionType = (
 ) => Promise<void>;
 
 type UseControllerReturnType = {
-  addAllowedRewardTokens: Ref<AddAllowedRewardTokensFunctionType | undefined>;
-  depositToken: Ref<DepositTokenFunctionType | undefined>;
   approveToken: Ref<ApproveTokenFunctionType | undefined>;
   tokenAllowance: Ref<TokenAllowanceFunctionType | undefined>;
   depositEqualWeeksPeriod: Ref<DepositEqualWeeksPeriodFunctionType | undefined>;
@@ -58,11 +51,6 @@ type UseControllerReturnType = {
 const ERC20 = [
   'function approve(address spender, uint256 amount) external returns (bool)',
   'function allowance(address owner, address spender) view returns (uint256)',
-];
-
-const RewardDistributorABI = [
-  'function addAllowedRewardTokens(address[] calldata tokens) external',
-  'function depositToken(address token, uint256 amount) external',
 ];
 
 const RewardFaucetABI = [
@@ -87,68 +75,12 @@ export const useController = ({
   network: Ref<NetworkConfig>;
   veSystem: Ref<VeSystem | undefined>;
 }): UseControllerReturnType => {
-  const addAllowedRewardTokens = ref<AddAllowedRewardTokensFunctionType>();
-  const depositToken = ref<DepositTokenFunctionType>();
   const approveToken = ref<ApproveTokenFunctionType>();
   const tokenAllowance = ref<TokenAllowanceFunctionType>();
   const depositEqualWeeksPeriod = ref<DepositEqualWeeksPeriodFunctionType>();
   const depositExactWeek = ref<DepositExactWeekFunctionType>();
 
   const initialize = () => {
-    addAllowedRewardTokens.value = async (
-      data: string[],
-      callbacks: CallbackOptionsType
-    ): Promise<void> => {
-      if (!walletProvider.value) return;
-      if (!veSystem.value) return;
-
-      const contractAddress = veSystem.value.rewardDistributorAddress;
-
-      const provider = new BrowserProvider(
-        walletProvider.value,
-        network.value.id
-      );
-      const signer = await provider.getSigner();
-      const contract = new ethers.Contract(
-        contractAddress,
-        RewardDistributorABI,
-        signer
-      );
-
-      await submitAction(
-        async () => await contract.addAllowedRewardTokens(data),
-        callbacks
-      );
-    };
-
-    depositToken.value = async (
-      data: DepositTokenParamsType,
-      callbacks: CallbackOptionsType
-    ): Promise<void> => {
-      if (!walletProvider.value) return;
-      if (!veSystem.value) return;
-
-      const contractAddress = veSystem.value.rewardDistributorAddress;
-
-      const provider = new BrowserProvider(
-        walletProvider.value,
-        network.value.id
-      );
-      const signer = await provider.getSigner();
-      const contract = new ethers.Contract(
-        contractAddress,
-        RewardDistributorABI,
-        signer
-      );
-
-      const { token, amount } = data;
-
-      await submitAction(
-        async () => await contract.depositToken(token, amount),
-        callbacks
-      );
-    };
-
     approveToken.value = async (
       data: ApproveTokenParamsType,
       callbacks: CallbackOptionsType
@@ -158,7 +90,7 @@ export const useController = ({
 
       const { token, amount } = data;
 
-      const spender = veSystem.value.rewardDistributorAddress;
+      const spender = veSystem.value.rewardFaucetAddress;
 
       const provider = new BrowserProvider(
         walletProvider.value,
@@ -177,7 +109,7 @@ export const useController = ({
       if (!walletProvider.value) return ethers.toBigInt(0);
       if (!veSystem.value) return ethers.toBigInt(0);
 
-      const spender = veSystem.value.rewardDistributorAddress;
+      const spender = veSystem.value.rewardFaucetAddress;
 
       const provider = new BrowserProvider(
         walletProvider.value,
@@ -257,8 +189,6 @@ export const useController = ({
   watch([network], initialize);
 
   return {
-    addAllowedRewardTokens,
-    depositToken,
     approveToken,
     tokenAllowance,
     depositEqualWeeksPeriod,

@@ -36,12 +36,18 @@ const showApprove = computed<boolean>(
     inputAmount.value !== '' && token.value !== '' && !isAllowanceEnough.value
 );
 
+const fetchAllowance = async () => {
+  const tokenAllowanceResult = await tokenAllowance.value?.(token.value);
+
+  console.log('allowance: ', tokenAllowanceResult);
+
+  allowance.value = tokenAllowanceResult || toBigInt(0);
+};
+
 watch(token, async value => {
   if (value === '') return;
 
-  const tokenAllowanceResult = await tokenAllowance.value?.(value);
-
-  allowance.value = tokenAllowanceResult || toBigInt(0);
+  await fetchAllowance();
 });
 
 watch(amount, value => console.log('amount: ', value));
@@ -89,9 +95,10 @@ const handleApprove = async () => {
       onSubmitted: ({ tx }) => {
         console.log('submitted', tx);
       },
-      onSuccess: ({ receipt }) => {
+      onSuccess: async ({ receipt }) => {
         console.log('success', receipt);
         isLoading.value = false;
+        await fetchAllowance();
       },
       onError: err => {
         console.log('err', err);
@@ -131,7 +138,7 @@ const tokens = computed<[string, string][]>(() => {
         v-show="!showApprove"
         class="submit-button"
         :disabled="token === '' || inputAmount === '' || isLoading"
-        @click="handleSubmit()"
+        @click="handleSubmit"
       >
         Add
       </button>
@@ -139,7 +146,7 @@ const tokens = computed<[string, string][]>(() => {
         v-show="showApprove"
         class="submit-button"
         :disabled="isLoading"
-        @click="handleApprove()"
+        @click="handleApprove"
       >
         Approve
       </button>
