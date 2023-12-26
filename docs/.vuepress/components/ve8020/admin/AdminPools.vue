@@ -2,6 +2,8 @@
 import { onBeforeMount } from 'vue';
 import { useVeSystem } from '../../../providers/veSystem';
 import { useTabs, Tab } from '../../../providers/tabs';
+import { ethers } from 'ethers';
+import TokenCard from '../TokenCard.vue';
 
 const { data: veSystems, fetch, select, isLoading } = useVeSystem();
 const { select: selectTab } = useTabs();
@@ -22,18 +24,24 @@ const showRewards = async (id: string) => {
 </script>
 
 <template>
-  <p>{{ isLoading ? 'loading' : '' }}</p>
-  <ul>
-    <li
-      v-for="veSystem in veSystems"
-      :key="veSystem.id"
-      @click="select(veSystem.id)"
-    >
-      {{ veSystem.bptTokenName }}
-      |
-      <button @click="showConfig(veSystem.id)">Config</button>
-      |
-      <button @click="showRewards(veSystem.id)">Rewards Distribution</button>
-    </li>
-  </ul>
+  <section class="section-container">
+    <div class="card-container">
+      <p>{{ isLoading ? 'loading' : '' }}</p>
+      <div v-for="veSystem in veSystems" :key="veSystem.id">
+        <TokenCard
+          :name="veSystem.id"
+          :vestedToken="veSystem.bptTokenName"
+          :totalValueVested="
+            ethers.formatEther(veSystem.votingEscrow.lockedAmount)
+          "
+          :availableTokensForRewards="
+            veSystem.rewardDistributor.rewardNames || []
+          "
+        />
+        <button @click="showConfig(veSystem.id)">Config</button>
+        |
+        <button @click="showRewards(veSystem.id)">Rewards Distribution</button>
+      </div>
+    </div>
+  </section>
 </template>
