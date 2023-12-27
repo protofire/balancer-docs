@@ -14,13 +14,17 @@ const { addAllowedRewardTokens } = useController({
   veSystem,
 });
 
-const token = ref<string>('');
+const tokens = ref<string[]>(['']);
 const isLoading = ref<boolean>(false);
 
 const submit = async () => {
-  if (token.value === undefined) return;
+  const tokensToSubmit = tokens.value.filter(
+    token => token !== undefined && token !== ''
+  );
 
-  await addAllowedRewardTokens.value?.([token.value], {
+  if (tokensToSubmit.length === 0) return;
+
+  await addAllowedRewardTokens.value?.(tokensToSubmit, {
     onPrompt: () => {
       console.log('prompt');
       isLoading.value = true;
@@ -31,7 +35,7 @@ const submit = async () => {
     onSuccess: ({ receipt }) => {
       console.log('success', receipt);
       isLoading.value = false;
-      token.value = '';
+      tokens.value = [''];
     },
     onError: err => {
       console.log('err', err);
@@ -39,28 +43,51 @@ const submit = async () => {
     },
   });
 };
+
+const addToken = () => {
+  tokens.value.push('');
+};
+
+const removeToken = (index: number) => {
+  tokens.value.splice(index, 1);
+};
 </script>
 
 <template>
-  <div key="newReward" class="item-row">
+  <div class="item-row">
     <p class="item-name">Set Available Rewards</p>
-    <div class="item-action">
-      <div class="input-group">
-        <input
-          v-model="token"
-          placeholder="0xa0b...6eb48"
-          type="text"
-          class="input"
-        />
-      </div>
-      <button
-        class="submit-button"
-        :disabled="token === '' || isLoading"
-        @click="submit()"
+    <div class="group-tokens">
+      <div
+        v-for="(token, index) in tokens"
+        :key="`token-${index}`"
+        class="tokens"
       >
-        {{ isLoading ? 'Setting...' : 'Set' }}
-      </button>
+        <div class="item-action">
+          <div class="input-group">
+            <input
+              v-model="tokens[index]"
+              placeholder="0xa0b...6eb48"
+              type="text"
+              class="input"
+            />
+          </div>
+          <button v-if="index === 0" class="add-button" @click="addToken">
+            +
+          </button>
+          <button v-else class="remove-button" @click="removeToken(index)">
+            -
+          </button>
+        </div>
+      </div>
     </div>
+
+    <button
+      class="submit-button"
+      :disabled="tokens[0] === '' || isLoading"
+      @click="submit()"
+    >
+      {{ isLoading ? 'Setting...' : 'Set' }}
+    </button>
   </div>
 </template>
 
@@ -79,11 +106,21 @@ input[type='number'] {
 .item-row {
   display: flex;
   width: 100%;
-  align-items: center;
-  justify-content: space-between;
   max-width: 700px;
-  height: 45px;
+  height: auto;
   gap: 10px;
+}
+
+.item-row .group-tokens {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: calc(60% - 70px);
+}
+
+.item-row .group-tokens .tokens {
+  height: 45px;
+  width: 100%;
 }
 
 .item-row .item-name {
@@ -92,22 +129,25 @@ input[type='number'] {
   font-size: 14px;
   font-weight: 500;
   margin: 0;
+  height: 45px;
+  display: flex;
+  align-items: center;
 }
 
-.item-row .item-action {
+.group-tokens .item-action {
   display: flex;
-  width: 60%;
+  width: 100%;
   align-items: center;
   height: 100%;
   gap: 10px;
 }
 
-.item-row .input-group {
+.group-tokens .input-group {
   height: 100%;
-  width: calc(100% - 70px);
+  width: 100%;
 }
 
-.item-row .input-group .input {
+.group-tokens .input-group .input {
   background-color: transparent;
   border: 1px solid #e2e8f0;
   position: relative;
@@ -121,21 +161,41 @@ input[type='number'] {
   align-items: center;
 }
 
-.dark .item-row .input-group .input {
+.dark .group-tokens .input-group .input {
   border: 1px solid #3e4c5a;
 }
 
-.item-row .input-group .input:focus {
+.group-tokens .input-group .input:focus {
   border: 1px solid #384aff;
 }
 
+.item-action .add-button,
+.item-action .remove-button {
+  background-color: #eaf0f6;
+  min-width: 45px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: none;
+  border: none;
+}
+
+.dark .item-action .add-button,
+.dark .item-action .remove-button {
+  background-color: #384aff;
+}
+
 .submit-button {
-  width: 60px;
+  min-width: 60px;
   height: 45px;
   background-color: #eaf0f6;
   border-radius: 6px;
   cursor: pointer;
-  align-self: flex-end;
   font-weight: 600;
   font-size: 14px;
   box-shadow: none;
@@ -145,6 +205,7 @@ input[type='number'] {
 .dark .submit-button {
   background-color: #384aff;
 }
+
 .submit-button:disabled {
   background-color: rgba(56, 74, 255, 0.2);
   cursor: not-allowed;
