@@ -16,13 +16,13 @@ const formFields = computed(() => {
       label: 'veToken Name',
       placeholder: 'Voting Escrow Balancer 80 GNO',
       name: 'veTokenName',
-      value: '',
+      value: veSystem.value?.votingEscrow.name,
     },
     {
       label: 'veToken Symbol',
       placeholder: 'veGNO80-WETH20',
       name: 'veTokenSymbol',
-      value: '',
+      value: veSystem.value?.votingEscrow.symbol,
     },
     {
       label: 'Factory used',
@@ -34,13 +34,13 @@ const formFields = computed(() => {
       label: 'Rewards Distribution Address',
       placeholder: '0x67c3...9a65c',
       name: 'rewardsAddress',
-      value: '',
+      value: veSystem.value?.rewardDistributorAddress,
     },
     {
       label: 'Distribution Start-time',
       type: 'date',
       name: 'distribution',
-      value: '',
+      value: veSystem.value?.rewardDistributor.rewardStartTime?.toString(),
     },
     {
       label: 'Supply % vested',
@@ -52,13 +52,7 @@ const formFields = computed(() => {
       label: 'Rewards Distribution Admin',
       placeholder: '0xb76f3...987b5',
       name: 'rewardsDistribution',
-      value: '',
-    },
-    {
-      label: 'Pending Rewards',
-      placeholder: '235600',
-      name: 'pendingRewards',
-      value: '',
+      value: veSystem.value?.admin,
     },
   ];
 });
