@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useWeb3ModalProvider } from '@web3modal/ethers/vue';
 import { useNetwork } from '../../../providers/network';
 import { useController } from '../../../utils/RewardsDistributionController';
@@ -17,10 +17,12 @@ const { addAllowedRewardTokens } = useController({
 const tokens = ref<string[]>(['']);
 const isLoading = ref<boolean>(false);
 
+const isEmpty = computed(() => tokens.value.some(token => token === ''));
+
 const submit = async () => {
-  const tokensToSubmit = tokens.value.filter(
-    token => token !== undefined && token !== ''
-  );
+  const tokensToSubmit = tokens.value.filter(token => token !== '');
+
+  console.log('tokensToSubmit', tokensToSubmit);
 
   if (tokensToSubmit.length === 0) return;
 
@@ -57,11 +59,7 @@ const removeToken = (index: number) => {
   <div class="item-row">
     <p class="item-name">Set Available Rewards</p>
     <div class="group-tokens">
-      <div
-        v-for="(token, index) in tokens"
-        :key="`token-${index}`"
-        class="tokens"
-      >
+      <div v-for="(_, index) in tokens" :key="`token-${index}`" class="tokens">
         <div class="item-action">
           <div class="input-group">
             <input
@@ -71,7 +69,12 @@ const removeToken = (index: number) => {
               class="input"
             />
           </div>
-          <button v-if="index === 0" class="add-button" @click="addToken">
+          <button
+            v-if="index === 0"
+            class="add-button"
+            :disabled="isEmpty"
+            @click="addToken"
+          >
             +
           </button>
           <button v-else class="remove-button" @click="removeToken(index)">
@@ -83,7 +86,7 @@ const removeToken = (index: number) => {
 
     <button
       class="submit-button"
-      :disabled="tokens[0] === '' || isLoading"
+      :disabled="isEmpty || isLoading"
       @click="submit()"
     >
       {{ isLoading ? 'Setting...' : 'Set' }}
@@ -206,6 +209,8 @@ input[type='number'] {
   background-color: #384aff;
 }
 
+.add-button:disabled,
+.remove-button:disabled,
 .submit-button:disabled {
   background-color: rgba(56, 74, 255, 0.2);
   cursor: not-allowed;
