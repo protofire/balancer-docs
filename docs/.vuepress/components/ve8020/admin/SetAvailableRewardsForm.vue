@@ -6,7 +6,7 @@ import { useController } from '../../../utils/RewardsDistributionController';
 import { useVeSystem } from '../../../providers/veSystem';
 
 const { walletProvider } = useWeb3ModalProvider();
-const { selected: veSystem } = useVeSystem();
+const { selected: veSystem, select } = useVeSystem();
 const { network } = useNetwork();
 const { addAllowedRewardTokens } = useController({
   walletProvider,
@@ -34,8 +34,9 @@ const submit = async () => {
     onSubmitted: ({ tx }) => {
       console.log('submitted', tx);
     },
-    onSuccess: ({ receipt }) => {
+    onSuccess: async ({ receipt }) => {
       console.log('success', receipt);
+      if (veSystem.value) await select(veSystem.value.id);
       isLoading.value = false;
       tokens.value = [''];
     },
