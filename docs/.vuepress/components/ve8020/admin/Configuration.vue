@@ -1,12 +1,35 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useVeSystem } from '../../../providers/veSystem';
 import { CONTRACT_ADDRESS } from '../../../utils/LaunchpadController';
 import { secondsToDate } from '../../../utils';
-import UnlockAll from './UnlockAllModal.vue';
+import UnlockAllModal from './UnlockAllModal.vue';
+import { useWeb3ModalProvider } from '@web3modal/ethers/vue';
+import { useNetwork } from '../../../providers/network';
+import { useController } from '../../../utils/VotingEscrowController';
 
+const { walletProvider } = useWeb3ModalProvider();
+const { network } = useNetwork();
 const { selected: veSystem } = useVeSystem();
+const { allUnlock, setAllUnlock } = useController({
+  walletProvider,
+  network,
+  veSystem,
+});
+
+const allUnlockStatus = ref<boolean>(false);
+const isLoading = ref<boolean>(false);
 const isUnlockAllModalOpen = ref<boolean>(false);
+
+watch(veSystem, async () => {
+  await fetchUnlockStatus();
+});
+
+const fetchUnlockStatus = async () => {
+  const allUnlockResult = await allUnlock.value?.();
+
+  allUnlockStatus.value = allUnlockResult ?? false;
+};
 
 const handleUnlockModalClose = () => {
   isUnlockAllModalOpen.value = false;
@@ -16,8 +39,26 @@ const handleUnlockModalOpen = () => {
   isUnlockAllModalOpen.value = true;
 };
 
-const handleUnlock = () => {
-  console.log('unlock');
+const handleUnlock = async () => {
+  await setAllUnlock.value?.({
+    onPrompt: () => {
+      console.log('onPrompt');
+    },
+    onSubmitted: ({ tx }) => {
+      console.log('onSubmitted', tx);
+      isUnlockAllModalOpen.value = false;
+      isLoading.value = true;
+    },
+    onSuccess: async ({ receipt }) => {
+      console.log('onSuccess', receipt);
+      isLoading.value = false;
+      fetchUnlockStatus();
+    },
+    onError: err => {
+      console.log('err', err);
+      isLoading.value = false;
+    },
+  });
 };
 
 const formFields = computed(() => {
@@ -97,13 +138,19 @@ const formFields = computed(() => {
       </div>
       <article class="group-btn">
         <div>
-          <UnlockAll
+          <UnlockAllModal
             :open="isUnlockAllModalOpen"
             :onClose="handleUnlockModalClose"
             :onUnlock="handleUnlock"
           />
-          <p>Status: locked</p>
-          <button class="btn" @click="handleUnlockModalOpen">Unlock All</button>
+          <p>Status: {{ allUnlockStatus }}</p>
+          <button
+            class="btn"
+            :disabled="allUnlockStatus || isLoading"
+            @click="handleUnlockModalOpen"
+          >
+            {{ isLoading ? 'Unlocking...' : 'Unlock All' }}
+          </button>
         </div>
         <div>
           <p>Status: enabled</p>
@@ -244,5 +291,11 @@ const formFields = computed(() => {
   font-weight: 600;
   font-size: 14px;
   color: #ffffff;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  background-color: rgba(56, 74, 255, 0.2);
+  color: grey;
 }
 </style>

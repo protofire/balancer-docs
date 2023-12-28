@@ -166,4 +166,9 @@ const props = defineProps<ModalPropsType>();
 .modal-popup.claim .item-row:nth-child(even) {
   background-color: rgba(56, 74, 255, 0.2);
 }
+.btn:disabled {
+  cursor: not-allowed;
+  background-color: rgba(56, 74, 255, 0.2);
+  color: grey;
+}
 </style>
