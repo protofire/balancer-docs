@@ -1,10 +1,18 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useVeSystem } from '../../../providers/veSystem';
+import { CONTRACT_ADDRESS } from '../../../utils/LaunchpadController';
+import { secondsToDate } from '../../../utils';
 
 const { selected: veSystem } = useVeSystem();
 
 const formFields = computed(() => {
+  const startTime = veSystem.value
+    ? secondsToDate(
+        parseInt(veSystem.value.rewardDistributor.rewardStartTime.toString())
+      ).toLocaleDateString()
+    : '';
+
   return [
     {
       label: 'Underlying 8020 BPT address',
@@ -25,10 +33,10 @@ const formFields = computed(() => {
       value: veSystem.value?.votingEscrow.symbol,
     },
     {
-      label: 'Factory used',
+      label: 'Launchpad Address',
       placeholder: '0x67c3...9a65c',
       name: 'factoryUsed',
-      value: '',
+      value: CONTRACT_ADDRESS,
     },
     {
       label: 'Rewards Distribution Address',
@@ -40,7 +48,7 @@ const formFields = computed(() => {
       label: 'Distribution Start-time',
       type: 'date',
       name: 'distribution',
-      value: veSystem.value?.rewardDistributor.rewardStartTime?.toString(),
+      value: startTime,
     },
     {
       label: 'Supply % vested',
