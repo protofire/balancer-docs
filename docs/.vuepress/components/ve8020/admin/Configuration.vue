@@ -1,10 +1,24 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useVeSystem } from '../../../providers/veSystem';
 import { CONTRACT_ADDRESS } from '../../../utils/LaunchpadController';
 import { secondsToDate } from '../../../utils';
+import UnlockAll from './UnlockAllModal.vue';
 
 const { selected: veSystem } = useVeSystem();
+const isUnlockAllModalOpen = ref<boolean>(false);
+
+const handleUnlockModalClose = () => {
+  isUnlockAllModalOpen.value = false;
+};
+
+const handleUnlockModalOpen = () => {
+  isUnlockAllModalOpen.value = true;
+};
+
+const handleUnlock = () => {
+  console.log('unlock');
+};
 
 const formFields = computed(() => {
   const startTime = veSystem.value
@@ -83,8 +97,13 @@ const formFields = computed(() => {
       </div>
       <article class="group-btn">
         <div>
+          <UnlockAll
+            :open="isUnlockAllModalOpen"
+            :onClose="handleUnlockModalClose"
+            :onUnlock="handleUnlock"
+          />
           <p>Status: locked</p>
-          <button class="btn">Unlock All</button>
+          <button class="btn" @click="handleUnlockModalOpen">Unlock All</button>
         </div>
         <div>
           <p>Status: enabled</p>
