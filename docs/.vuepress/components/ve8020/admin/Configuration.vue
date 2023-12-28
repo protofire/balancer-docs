@@ -82,8 +82,9 @@ const formFields = computed(() => {
         </div>
       </div>
       <article class="group-btn">
-        <button class="lock-button btn">Lock</button>
-        <button class="claim-button btn">Claim</button>
+        <button class="btn">Unlock All</button>
+        <button class="btn">Early Unlock</button>
+        <button class="btn">Set Early Penalty</button>
       </article>
     </section>
   </main>
