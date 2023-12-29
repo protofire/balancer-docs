@@ -5,6 +5,7 @@ import { CONTRACT_ADDRESS } from '../../../utils/LaunchpadController';
 import { secondsToDate } from '../../../utils';
 import UnlockAllModal from './UnlockAllModal.vue';
 import EarlyUnlockModal from './EarlyUnlockModal.vue';
+import EarlyPenaltyModal from './EarlyPenaltyModal.vue';
 import { useWeb3ModalProvider } from '@web3modal/ethers/vue';
 import { useNetwork } from '../../../providers/network';
 import { useController } from '../../../utils/VotingEscrowController';
@@ -20,8 +21,10 @@ const { allUnlock, setAllUnlock, earlyUnlock, setEarlyUnlock } = useController({
 
 const allUnlockStatus = ref<boolean>(false);
 const earlyUnlockStatus = ref<boolean>(false);
+const earlyPenalty = ref<number>();
 
 const isLoading = ref<boolean>(false);
+const isEarlyPenaltyModalOpen = ref<boolean>(false);
 const isUnlockAllModalOpen = ref<boolean>(false);
 const isEarlyUnlockModalOpen = ref<boolean>(false);
 const isLoadingEarlyUnlock = ref<boolean>(false);
@@ -57,6 +60,14 @@ const handleEarlyUnlockModalClose = () => {
 
 const handleEarlyUnlockModalOpen = () => {
   isEarlyUnlockModalOpen.value = true;
+};
+
+const handleEarlyPenaltyModalClose = () => {
+  isEarlyPenaltyModalOpen.value = false;
+};
+
+const handleEarlyPenaltyModalOpen = () => {
+  isEarlyPenaltyModalOpen.value = true;
 };
 
 const handleEarlyUnlock = async () => {
@@ -101,6 +112,10 @@ const handleUnlock = async () => {
       isLoading.value = false;
     },
   });
+};
+
+const handleSetEarlyPenalty = (penalty: number) => {
+  console.log('set penalty', penalty);
 };
 
 const formFields = computed(() => {
@@ -211,8 +226,16 @@ const formFields = computed(() => {
           </button>
         </div>
         <div>
-          <p>Early Penalty: 30</p>
-          <button class="btn">Set Early Penalty</button>
+          <EarlyPenaltyModal
+            :open="isEarlyPenaltyModalOpen"
+            :onClose="handleEarlyPenaltyModalClose"
+            :onSubmit="handleSetEarlyPenalty"
+            :earlyPenalty="earlyPenalty"
+          />
+          <p>Early Penalty: {{ earlyPenalty }}</p>
+          <button class="btn" @click="handleEarlyPenaltyModalOpen">
+            Set Early Penalty
+          </button>
         </div>
       </article>
     </section>
