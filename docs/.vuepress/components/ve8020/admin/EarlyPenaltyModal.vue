@@ -1,16 +1,24 @@
 <script setup lang="ts">
-import { defineProps, ref } from 'vue';
+import { defineProps, ref, watch } from 'vue';
 
 type ModalPropsType = {
   open: boolean;
   onClose: () => void;
   onSubmit: (penalty: number) => void;
-  earlyPenalty?: number;
+  earlyPenalty: number;
 };
 
 const props = defineProps<ModalPropsType>();
 
-const earlyPenaltyInput = ref<number | undefined>(props.earlyPenalty);
+const earlyPenaltyInput = ref<number | undefined>();
+
+watch(
+  () => props.earlyPenalty,
+  value => {
+    console.log(value);
+    earlyPenaltyInput.value = value;
+  }
+);
 </script>
 
 <template>

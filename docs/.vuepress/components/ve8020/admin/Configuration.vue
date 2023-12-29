@@ -9,11 +9,18 @@ import EarlyPenaltyModal from './EarlyPenaltyModal.vue';
 import { useWeb3ModalProvider } from '@web3modal/ethers/vue';
 import { useNetwork } from '../../../providers/network';
 import { useController } from '../../../utils/VotingEscrowController';
+import { ethers } from 'ethers';
 
 const { walletProvider } = useWeb3ModalProvider();
 const { network } = useNetwork();
 const { selected: veSystem } = useVeSystem();
-const { allUnlock, setAllUnlock, earlyUnlock, setEarlyUnlock } = useController({
+const {
+  allUnlock,
+  setAllUnlock,
+  earlyUnlock,
+  setEarlyUnlock,
+  getEarlyUnlockPenalty,
+} = useController({
   walletProvider,
   network,
   veSystem,
@@ -21,7 +28,7 @@ const { allUnlock, setAllUnlock, earlyUnlock, setEarlyUnlock } = useController({
 
 const allUnlockStatus = ref<boolean>(false);
 const earlyUnlockStatus = ref<boolean>(false);
-const earlyPenalty = ref<number>();
+const earlyPenalty = ref<number>(0);
 
 const isLoading = ref<boolean>(false);
 const isEarlyPenaltyModalOpen = ref<boolean>(false);
@@ -30,9 +37,15 @@ const isEarlyUnlockModalOpen = ref<boolean>(false);
 const isLoadingEarlyUnlock = ref<boolean>(false);
 
 watch(veSystem, async () => {
+  await fetchEarlyPenalty();
   await fetchUnlockStatus();
   await fetchEarlyUnlockStatus();
 });
+
+const fetchEarlyPenalty = async () => {
+  const result = await getEarlyUnlockPenalty.value?.();
+  earlyPenalty.value = result ? ethers.toNumber(result) : 0;
+};
 
 const fetchUnlockStatus = async () => {
   const allUnlockResult = await allUnlock.value?.();
