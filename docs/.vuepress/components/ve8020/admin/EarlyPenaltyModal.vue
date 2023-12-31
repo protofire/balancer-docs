@@ -93,7 +93,20 @@ input[type='number'] {
 
 @media (max-width: 1520px) {
   .modal-popup {
-    left: calc(50%);
+    left: calc(50% - 160px);
+  }
+}
+
+@media (max-width: 1200px) {
+  .modal-popup {
+    left: calc(10% - 260px);
+  }
+}
+
+@media (max-width: 1000px) {
+  .modal-popup {
+    left: calc(10% - 260px);
+    max-width: 400px;
   }
 }
 
@@ -145,13 +158,15 @@ input[type='number'] {
 
 .item-row .item-name {
   margin: 0;
+  min-width: 90px;
 }
 
 .item-row .input-group {
   height: 100%;
   display: flex;
   align-items: center;
-  min-width: 270px;
+  width: 100%;
+  max-width: 270px;
   justify-content: flex-end;
 }
 
@@ -159,7 +174,6 @@ input[type='number'] {
   border-radius: 6px;
   height: 100%;
   width: 100%;
-  max-width: 340px;
   padding-inline: 20px;
   font-size: 14px;
   outline: none;
