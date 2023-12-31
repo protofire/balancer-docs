@@ -99,24 +99,23 @@ input[type='number'] {
 
 @media (max-width: 1200px) {
   .modal-popup {
-    left: calc(10% - 260px);
+    left: 40%;
   }
 }
 
 @media (max-width: 1000px) {
   .modal-popup {
-    left: calc(10% - 260px);
     max-width: 400px;
   }
 }
 
 @media (max-width: 720px) {
   .modal-popup {
-    left: calc(50% - 280px);
+    left: calc(50% - 200px);
   }
 }
 
-@media (max-width: 360px) {
+@media (max-width: 460px) {
   .modal-popup {
     left: 5%;
   }
