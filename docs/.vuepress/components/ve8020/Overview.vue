@@ -24,20 +24,18 @@ const handleSearch = () => {
   <section class="section-container">
     <section class="section-head">
       <div class="address-group">
-        <p class="text">veToken Adddress/name</p>
         <div class="input-group">
           <svg width="16" height="16" class="icon">
             <use href="/images/search.svg#icon"></use>
           </svg>
-          <input v-model="searchTerm" class="input" placeholder="Search" />
+          <input
+            v-model="searchTerm"
+            class="input"
+            placeholder="Search by vested token address "
+          />
         </div>
       </div>
-      <button
-        class="search-btn btn"
-        @click="handleSearch"
-      >
-        Search veSystem
-      </button>
+      <button class="search-btn btn" @click="handleSearch">Search</button>
     </section>
     <section class="section-body">
       <TokenCard
@@ -64,7 +62,9 @@ const handleSearch = () => {
   padding-bottom: 15px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
+  gap: 10px;
+  width: 100%;
 }
 .dark .section-head {
   border-bottom: 1px solid #3e4c5a;
@@ -75,6 +75,8 @@ const handleSearch = () => {
   align-items: center;
   gap: 16px;
   height: 30px;
+  width: 100%;
+  justify-content: flex-end;
 }
 
 .section-head .address-group .icon {
@@ -91,6 +93,8 @@ const handleSearch = () => {
 .section-head .address-group .input-group {
   height: 100%;
   position: relative;
+  max-width: 250px;
+  width: 100%;
 }
 
 .section-head .address-group .input {
@@ -99,14 +103,35 @@ const handleSearch = () => {
   border-radius: 6px;
   height: 100%;
   width: 100%;
-  max-width: 340px;
-  padding-left: 30px;
+  padding-left: 35px;
   font-size: 14px;
   outline: none;
 }
 
 .dark .section-head .address-group .input {
   border: 1px solid #3e4c5a;
+}
+
+.section-head .btn {
+  height: 30px;
+  min-width: 100px;
+  background-color: #384aff;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  font-weight: 600;
+  font-size: 14px;
+  color: #ffffff;
+}
+
+.section-head .btn:disabled {
+  background-color: rgba(56, 74, 255, 0.2);
+  cursor: not-allowed;
+  color: #e2e8f0;
+}
+
+.dark .section-head .btn:disabled {
+  color: #3e4c5a;
 }
 
 .section-body {
