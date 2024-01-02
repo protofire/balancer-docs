@@ -2,34 +2,42 @@
 import { ethers } from 'ethers';
 import { useVeSystem } from '../../providers/veSystem';
 import TokenCard from './TokenCard.vue';
-import * as debounce from 'lodash.debounce';
-import { onBeforeMount } from 'vue';
+import { onBeforeMount, ref } from 'vue';
 const { data: veSystems, fetch, updateByTokenAddress } = useVeSystem();
+
+const searchTerm = ref<string>('');
 
 onBeforeMount(() => {
   fetch();
 });
 
-const onInput = debounce(event => {
-  updateByTokenAddress(event.target.value);
-}, 300);
+const handleSearch = () => {
+  if (searchTerm.value !== '') {
+    updateByTokenAddress(searchTerm.value);
+  } else {
+    fetch();
+  }
+};
 </script>
 
 <template>
   <section class="section-container">
     <section class="section-head">
       <div class="address-group">
+        <p class="text">veToken Adddress/name</p>
         <div class="input-group">
           <svg width="16" height="16" class="icon">
             <use href="/images/search.svg#icon"></use>
           </svg>
-          <input
-            class="input"
-            placeholder="Filter by vested token address"
-            @input="onInput"
-          />
+          <input v-model="searchTerm" class="input" placeholder="Search" />
         </div>
       </div>
+      <button
+        class="search-btn btn"
+        @click="handleSearch"
+      >
+        Search veSystem
+      </button>
     </section>
     <section class="section-body">
       <TokenCard
