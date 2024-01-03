@@ -1,13 +1,34 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useVeSystem } from '../../providers/veSystem';
 import { secondsToDate } from '../../utils';
 import { useWeb3ModalProvider } from '@web3modal/ethers/vue';
 import { useNetwork } from '../../providers/network';
+import { useController } from '../../utils/VotingEscrowController';
+import LockModal from './LockModal.vue';
 
 const { walletProvider } = useWeb3ModalProvider();
 const { network } = useNetwork();
 const { selected: veSystem } = useVeSystem();
+const { createLock } = useController({
+  walletProvider,
+  network,
+  veSystem,
+});
+
+const isLockModalOpen = ref<boolean>(false);
+
+const handleLockModalClose = () => {
+  isLockModalOpen.value = false;
+};
+
+const handleLockModalOpen = () => {
+  isLockModalOpen.value = true;
+};
+
+const handleLock = async (amount: number, lockTime: number) => {
+  console.log('create lock', amount, lockTime);
+};
 
 const formFields = computed(() => {
   const startTime = veSystem.value
@@ -68,7 +89,12 @@ const formFields = computed(() => {
       </div>
       <article class="group-btn">
         <div>
-          <button class="btn">Lock</button>
+          <LockModal
+            :open="isLockModalOpen"
+            :onClose="handleLockModalClose"
+            :onSubmit="handleLock"
+          />
+          <button class="btn" @click="handleLockModalOpen">Lock</button>
         </div>
         <div>
           <button class="btn">Withdraw</button>
