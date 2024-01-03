@@ -3,7 +3,12 @@ import { ethers } from 'ethers';
 import { useVeSystem } from '../../providers/veSystem';
 import TokenCard from './TokenCard.vue';
 import { onBeforeMount, ref } from 'vue';
-const { data: veSystems, fetch, updateByTokenAddress } = useVeSystem();
+const {
+  data: veSystems,
+  fetch,
+  updateByTokenAddress,
+  isLoading,
+} = useVeSystem();
 
 const searchTerm = ref<string>('');
 
@@ -11,11 +16,11 @@ onBeforeMount(() => {
   fetch();
 });
 
-const handleSearch = () => {
+const handleSearch = async () => {
   if (searchTerm.value !== '') {
-    updateByTokenAddress(searchTerm.value);
+    await updateByTokenAddress(searchTerm.value);
   } else {
-    fetch();
+    await fetch();
   }
 };
 </script>
@@ -35,7 +40,13 @@ const handleSearch = () => {
           />
         </div>
       </div>
-      <button class="search-btn btn" @click="handleSearch">Search</button>
+      <button
+        class="search-btn btn"
+        :disabled="isLoading"
+        @click="handleSearch"
+      >
+        Search
+      </button>
     </section>
     <section class="section-body">
       <TokenCard
