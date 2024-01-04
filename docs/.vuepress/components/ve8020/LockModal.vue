@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { defineProps, ref } from 'vue';
+import { defineProps, ref, computed } from 'vue';
+import { dateToSeconds } from '../../utils';
 
 type ModalPropsType = {
   open: boolean;
@@ -11,6 +12,14 @@ const props = defineProps<ModalPropsType>();
 
 const amountInput = ref<number | undefined>();
 const releaseTimeInput = ref<number | undefined>();
+
+const releaseTime = computed<number>(() => {
+  if (!releaseTimeInput.value) return 0;
+
+  const d = new Date(releaseTimeInput.value.toString());
+
+  return dateToSeconds(d);
+});
 </script>
 
 <template>
@@ -34,9 +43,8 @@ const releaseTimeInput = ref<number | undefined>();
           <div class="input-group">
             <input
               v-model="releaseTimeInput"
-              type="number"
+              type="datetime-local"
               class="input"
-              placeholder="10"
             />
           </div>
         </div>
@@ -49,7 +57,7 @@ const releaseTimeInput = ref<number | undefined>();
           @click="
             amountInput &&
               releaseTimeInput &&
-              onSubmit(amountInput, releaseTimeInput)
+              onSubmit(amountInput, releaseTime)
           "
         >
           Submit
@@ -214,6 +222,4 @@ input[type='number'] {
   border: 1px solid #384aff;
   background-color: rgba(56, 74, 255, 0.2);
 }
-
-
 </style>

@@ -6,6 +6,7 @@ import { useWeb3ModalProvider } from '@web3modal/ethers/vue';
 import { useNetwork } from '../../providers/network';
 import { useController } from '../../utils/VotingEscrowController';
 import LockModal from './LockModal.vue';
+import { ethers } from 'ethers';
 
 const { walletProvider } = useWeb3ModalProvider();
 const { network } = useNetwork();
@@ -15,6 +16,8 @@ const { createLock } = useController({
   network,
   veSystem,
 });
+
+const isLoadingLock = ref<boolean>(false);
 
 const isLockModalOpen = ref<boolean>(false);
 
@@ -28,6 +31,31 @@ const handleLockModalOpen = () => {
 
 const handleLock = async (amount: number, lockTime: number) => {
   console.log('create lock', amount, lockTime);
+
+  await createLock.value?.(
+    {
+      value: ethers.parseEther(amount.toString()),
+      lockTime: ethers.toBigInt(lockTime),
+    },
+    {
+      onPrompt: () => {
+        console.log('onPrompt');
+        isLockModalOpen.value = false;
+      },
+      onSubmitted: ({ tx }) => {
+        console.log('onSubmitted', tx);
+        isLoadingLock.value = true;
+      },
+      onSuccess: async ({ receipt }) => {
+        console.log('onSuccess', receipt);
+        isLoadingLock.value = false;
+      },
+      onError: err => {
+        console.log('err', err);
+        isLoadingLock.value = false;
+      },
+    }
+  );
 };
 
 const formFields = computed(() => {
@@ -94,7 +122,13 @@ const formFields = computed(() => {
             :onClose="handleLockModalClose"
             :onSubmit="handleLock"
           />
-          <button class="btn" @click="handleLockModalOpen">Lock</button>
+          <button
+            class="btn"
+            :disabled="isLoadingLock"
+            @click="handleLockModalOpen"
+          >
+            {{ isLoadingLock ? 'Locking...' : 'Lock' }}
+          </button>
         </div>
         <div>
           <button class="btn">Withdraw</button>
