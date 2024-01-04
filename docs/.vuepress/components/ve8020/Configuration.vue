@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useVeSystem } from '../../providers/veSystem';
-import { secondsToDate } from '../../utils';
+import { VeSystem, secondsToDate } from '../../utils';
 import { useWeb3ModalProvider } from '@web3modal/ethers/vue';
 import { useNetwork } from '../../providers/network';
 import { useController } from '../../utils/VotingEscrowController';
+import { useController as useTokenController } from '../../utils/TokenController';
 import LockModal from './LockModal.vue';
 import { ethers } from 'ethers';
 
@@ -17,8 +18,27 @@ const { createLock } = useController({
   veSystem,
 });
 
-const isLoadingLock = ref<boolean>(false);
+const { allowance, approve } = useTokenController({
+  walletProvider,
+  network,
+});
 
+const tokenAllowance = ref<number>(0);
+
+const fetchAllowance = async (ve: VeSystem) => {
+  const result = await allowance.value?.(ve.bptToken, ve.votingEscrow.address);
+
+  tokenAllowance.value = result ? parseFloat(ethers.formatEther(result)) : 0;
+};
+
+watch(veSystem, async ve => {
+  if (!ve) return;
+
+  await fetchAllowance(ve);
+});
+
+const isLoadingLock = ref<boolean>(false);
+const isLoadingApprove = ref<boolean>(false);
 const isLockModalOpen = ref<boolean>(false);
 
 const handleLockModalClose = () => {
@@ -27,6 +47,36 @@ const handleLockModalClose = () => {
 
 const handleLockModalOpen = () => {
   isLockModalOpen.value = true;
+};
+
+const handleApprove = async (amount: number) => {
+  if (!veSystem.value) return;
+
+  await approve.value?.(
+    {
+      token: veSystem.value.bptToken,
+      amount: ethers.parseEther(amount.toString()),
+      spender: veSystem.value.votingEscrow.address,
+    },
+    {
+      onPrompt: () => {
+        console.log('onPrompt');
+      },
+      onSubmitted: ({ tx }) => {
+        console.log('onSubmitted', tx);
+        isLoadingApprove.value = true;
+      },
+      onSuccess: async ({ receipt }) => {
+        console.log('onSuccess', receipt);
+        veSystem.value && (await fetchAllowance(veSystem.value));
+        isLoadingApprove.value = false;
+      },
+      onError: err => {
+        console.log('err', err);
+        isLoadingApprove.value = false;
+      },
+    }
+  );
 };
 
 const handleLock = async (amount: number, lockTime: number) => {
@@ -121,6 +171,9 @@ const formFields = computed(() => {
             :open="isLockModalOpen"
             :onClose="handleLockModalClose"
             :onSubmit="handleLock"
+            :allowance="tokenAllowance"
+            :onApprove="handleApprove"
+            :isLoadingApprove="isLoadingApprove"
           />
           <button
             class="btn"

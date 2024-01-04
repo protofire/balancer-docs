@@ -1,22 +1,36 @@
 <script setup lang="ts">
-import { defineProps, ref, computed } from 'vue';
+import { defineProps, ref, computed, watch } from 'vue';
 import { dateToSeconds } from '../../utils';
 
 type ModalPropsType = {
   open: boolean;
+  allowance: number;
+  isLoadingApprove: boolean;
   onClose: () => void;
   onSubmit: (amount: number, releaseTime: number) => void;
+  onApprove: (amount: number) => void;
 };
 
 const props = defineProps<ModalPropsType>();
 
-const amountInput = ref<number | undefined>();
-const releaseTimeInput = ref<number | undefined>();
+const amountInput = ref<string>('');
+const releaseTimeInput = ref<string>('');
+
+watch(
+  () => props.open,
+  () => {
+    amountInput.value = '';
+    releaseTimeInput.value = '';
+});
+
+const amount = computed<number>(() =>
+  amountInput.value === '' ? 0 : parseFloat(amountInput.value)
+);
 
 const releaseTime = computed<number>(() => {
-  if (!releaseTimeInput.value) return 0;
+  if (releaseTimeInput.value === '') return 0;
 
-  const d = new Date(releaseTimeInput.value.toString());
+  const d = new Date(releaseTimeInput.value);
 
   return dateToSeconds(d);
 });
@@ -52,15 +66,20 @@ const releaseTime = computed<number>(() => {
       <div class="btn-group">
         <button class="btn close" @click="props.onClose">Close</button>
         <button
+          v-show="allowance >= amount"
           class="btn submit"
-          :disabled="!amountInput || !releaseTimeInput"
-          @click="
-            amountInput &&
-              releaseTimeInput &&
-              onSubmit(amountInput, releaseTime)
-          "
+          :disabled="amountInput === '' || releaseTimeInput === ''"
+          @click="onSubmit(amount, releaseTime)"
         >
           Submit
+        </button>
+        <button
+          v-show="allowance < amount"
+          class="btn submit approve"
+          :disabled="props.isLoadingApprove"
+          @click="onApprove(amount)"
+        >
+          {{ isLoadingApprove ? 'Approving' : 'Approve' }}
         </button>
       </div>
     </div>
@@ -216,6 +235,10 @@ input[type='number'] {
 
 .modal-popup .btn-group .btn.submit {
   color: #ffffff;
+}
+
+.modal-popup .btn-group .btn.approve {
+  background-color: #1dcc37;
 }
 
 .modal-popup .btn-group .btn.close {
