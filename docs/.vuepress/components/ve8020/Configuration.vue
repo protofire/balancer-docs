@@ -6,6 +6,10 @@ import { useWeb3ModalProvider } from '@web3modal/ethers/vue';
 import { useNetwork } from '../../providers/network';
 import { useController } from '../../utils/VotingEscrowController';
 import { useController as useTokenController } from '../../utils/TokenController';
+import {
+  ClaimableReward,
+  useController as useLensRewardController,
+} from '../../utils/LensRewardController';
 import LockModal from './LockModal.vue';
 import ClaimModal from './ClaimModal.vue';
 import WithdrawModal from './WithdrawModal.vue';
@@ -25,7 +29,14 @@ const { allowance, approve } = useTokenController({
   network,
 });
 
+const { getUserClaimableRewardsAll } = useLensRewardController({
+  walletProvider,
+  network,
+  veSystem,
+});
+
 const tokenAllowance = ref<number>(0);
+const claimableRewards = ref<ClaimableReward[]>();
 
 const fetchAllowance = async (ve: VeSystem) => {
   const result = await allowance.value?.(ve.bptToken, ve.votingEscrow.address);
@@ -37,14 +48,18 @@ watch(veSystem, async ve => {
   if (!ve) return;
 
   await fetchAllowance(ve);
+  const result = await getUserClaimableRewardsAll.value?.();
+
+  claimableRewards.value = result;
 });
 
 const tokens = computed(() => {
   if (!veSystem.value) return [];
+  if (!claimableRewards.value) return [];
 
-  return veSystem.value.rewardDistributor.rewardNames.map(token => ({
+  return claimableRewards.value.map(([token, claimableAmount]) => ({
     token,
-    claimableAmount: 100,
+    claimableAmount: ethers.formatEther(claimableAmount),
   }));
 });
 

@@ -3,7 +3,7 @@ import { defineProps } from 'vue';
 
 type ClaimableTokenType = {
   token: string;
-  claimableAmount: number;
+  claimableAmount: string;
 };
 
 type ModalPropsType = {
