@@ -39,12 +39,14 @@ watch(veSystem, async ve => {
   await fetchAllowance(ve);
 });
 
-const tokens = [
-  { token: 'Token 1', claimableAmount: 1000 },
-  { token: 'Token 2', claimableAmount: 100 },
-  { token: 'Token 3', claimableAmount: 677 },
-  { token: 'Token 4', claimableAmount: 5600 },
-];
+const tokens = computed(() => {
+  if (!veSystem.value) return [];
+
+  return veSystem.value.rewardDistributor.rewardNames.map(token => ({
+    token,
+    claimableAmount: 100,
+  }));
+});
 
 const isLoadingLock = ref<boolean>(false);
 const isLoadingApprove = ref<boolean>(false);
