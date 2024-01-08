@@ -7,6 +7,7 @@ import { useNetwork } from '../../providers/network';
 import { useController } from '../../utils/VotingEscrowController';
 import { useController as useTokenController } from '../../utils/TokenController';
 import LockModal from './LockModal.vue';
+import ClaimModal from './ClaimModal.vue';
 import WithdrawModal from './WithdrawModal.vue';
 import { ethers } from 'ethers';
 
@@ -38,11 +39,19 @@ watch(veSystem, async ve => {
   await fetchAllowance(ve);
 });
 
+const tokens = [
+  { token: 'Token 1', claimableAmount: 1000 },
+  { token: 'Token 2', claimableAmount: 100 },
+  { token: 'Token 3', claimableAmount: 677 },
+  { token: 'Token 4', claimableAmount: 5600 },
+];
+
 const isLoadingLock = ref<boolean>(false);
 const isLoadingApprove = ref<boolean>(false);
 const isLoadingWithdraw = ref<boolean>(false);
 const isLockModalOpen = ref<boolean>(false);
 const isWithdrawModalOpen = ref<boolean>(false);
+const isClaimModalOpen = ref<boolean>(false);
 
 const handleLockModalClose = () => {
   isLockModalOpen.value = false;
@@ -58,6 +67,18 @@ const handleWithdrawModalClose = () => {
 
 const handleWithdrawModalOpen = () => {
   isWithdrawModalOpen.value = true;
+};
+
+const handleClaimModalClose = () => {
+  isClaimModalOpen.value = false;
+};
+
+const handleClaimModalOpen = () => {
+  isClaimModalOpen.value = true;
+};
+
+const handleClaim = () => {
+  console.log('claim');
 };
 
 const handleWithdraw = async () => {
@@ -230,7 +251,13 @@ const formFields = computed(() => {
           </button>
         </div>
         <div>
-          <button class="btn">Claim</button>
+          <ClaimModal
+            :open="isClaimModalOpen"
+            :tokens="tokens"
+            :onClose="handleClaimModalClose"
+            :onSubmit="handleClaim"
+          />
+          <button class="btn" @click="handleClaimModalOpen">Claim</button>
         </div>
       </article>
     </section>
