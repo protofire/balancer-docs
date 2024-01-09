@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps } from 'vue';
+import { defineProps, ref } from 'vue';
 
 type ClaimableTokenType = {
   token: string;
@@ -14,6 +14,15 @@ type ModalPropsType = {
 };
 
 const props = defineProps<ModalPropsType>();
+const tokens = ref(props.tokens.map(token => ({ ...token, checked: false })));
+const toggleCheckbox = (i: number) => {
+  tokens.value[i].checked = !tokens.value[i].checked;
+};
+const allSelected = ref(false);
+const toggleSelectAll = () => {
+  allSelected.value = !allSelected.value;
+  tokens.value.forEach(token => (token.checked = allSelected.value));
+};
 </script>
 
 <template>
@@ -21,22 +30,43 @@ const props = defineProps<ModalPropsType>();
     <div class="modal-popup claim">
       <div class="head">
         <div class="item-row">
+          <div class="item-check"></div>
           <p class="item-name">Token</p>
           <p class="item-value">Claimable Amount</p>
         </div>
       </div>
       <div class="body">
-        <div v-for="item in tokens" :key="item.token" class="item-row">
-          <p class="item-name">
-            <input type="checkbox" />
-          </p>
+        <div v-for="(item, i) in tokens" :key="item.token" class="item-row">
+          <div class="item-check" @click="toggleCheckbox(i)">
+            <svg v-if="item.checked" width="16" height="16" class="icon">
+              <use href="/images/check2-square.svg#icon"></use>
+            </svg>
+            <svg v-else width="14" height="14" class="icon">
+              <use href="/images/square.svg#icon"></use>
+            </svg>
+          </div>
+
           <p class="item-name">{{ item.token }}</p>
           <p class="item-value">{{ item.claimableAmount }}</p>
         </div>
       </div>
-      <div class="btn-group">
-        <button class="btn close" @click="props.onClose">Close</button>
-        <button class="btn">Submit</button>
+      <div class="footerModal">
+        <div class="row-check">
+          <div class="item-check" @click="toggleSelectAll">
+            <svg v-if="allSelected" width="16" height="16" class="icon">
+              <use href="/images/check2-square.svg#icon"></use>
+            </svg>
+            <svg v-else width="14" height="14" class="icon">
+              <use href="/images/square.svg#icon"></use>
+            </svg>
+          </div>
+          <p class="title-check">Claim All My Tokens</p>
+        </div>
+
+        <div class="btn-group">
+          <button class="btn close" @click="props.onClose">Close</button>
+          <button class="btn submit">Submit</button>
+        </div>
       </div>
     </div>
   </div>
@@ -69,37 +99,13 @@ const props = defineProps<ModalPropsType>();
   background-color: #0d1834;
 }
 
-/* MODAL LOCK*/
-.modal-popup.lock {
-  top: calc(50% - 250px);
+/* MODAL CLAIM */
+
+.modal-container .modal-popup.claim {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 36px 20px;
-}
-
-.modal-popup.lock .item-row {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  height: 45px;
-}
-
-.modal-popup.lock .item-row .item-name,
-.modal-popup.lock .item-row .item-value {
-  width: 50%;
-  font-size: 14px;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  margin: 0;
-  font-weight: 500;
-}
-.modal-popup.lock .item-row .item-value {
-  background-color: rgba(56, 74, 255, 0.2);
-  border: 1px solid #384aff;
-  border-radius: 6px;
-  padding-left: 16px;
+  padding: 16px;
+  top: 300px;
 }
 
 @media (max-width: 622px) {
@@ -109,11 +115,70 @@ const props = defineProps<ModalPropsType>();
 }
 
 @media (max-height: 700px) {
-  .modal-container .modal-popup.lock {
+  .modal-container .modal-popup.claim {
     top: 100px;
   }
 }
 
+.modal-popup.claim .head .item-row,
+.modal-popup.claim .body .item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  height: 40px;
+}
+.modal-popup.claim .head {
+  border-bottom: 1px solid #384aff;
+}
+.modal-popup.claim .item-row .item-name,
+.modal-popup.claim .item-row .item-value {
+  width: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+.modal-popup.claim .item-row .item-check {
+  min-width: 40px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dark .item-check .icon {
+  fill: #ffffff;
+}
+.modal-popup.claim .body {
+  margin-bottom: 20px;
+}
+.modal-popup.claim .item-row:nth-child(even) {
+  background-color: rgba(56, 74, 255, 0.2);
+}
+
+.modal-popup .footerModal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.footerModal .row-check {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.row-check .title-check {
+  margin: 0;
+}
+
+.modal-popup.claim .footerModal .item-check {
+  min-width: 40px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .modal-popup .btn-group {
   display: flex;
   align-items: center;
@@ -131,7 +196,6 @@ const props = defineProps<ModalPropsType>();
   border: none;
   font-weight: 600;
 }
-
 .modal-popup .btn-group .btn.submit {
   color: #ffffff;
 }
@@ -141,43 +205,13 @@ const props = defineProps<ModalPropsType>();
   background-color: rgba(56, 74, 255, 0.2);
 }
 
-/* MODAL CLAIM */
-
-.modal-container .modal-popup.claim {
-  display: flex;
-  flex-direction: column;
-  padding: 16px;
-  top: calc(50% - 300px);
-}
-
-@media (max-height: 800px) {
-  .modal-container .modal-popup.claim {
-    top: 100px;
+@media (max-width: 550px) {
+  .modal-popup .footerModal {
+    flex-direction: column;
+    align-items: flex-start;
   }
-}
-
-.modal-popup.claim .head .item-row,
-.modal-popup.claim .body .item-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  height: 40px;
-}
-.modal-popup.claim .head {
-  border-bottom: 1px solid #384aff;
-}
-.modal-popup.claim .item-row .item-name,
-.modal-popup.claim .item-name .item-value {
-  width: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0;
-}
-.modal-popup.claim .body {
-  margin-bottom: 20px;
-}
-.modal-popup.claim .item-row:nth-child(even) {
-  background-color: rgba(56, 74, 255, 0.2);
+  .modal-popup .btn-group {
+    width: 100%;
+  }
 }
 </style>
