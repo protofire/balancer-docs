@@ -24,11 +24,17 @@ type ApproveTokenFunctionType = DepositTokenFunctionType;
 
 type TokenAllowanceFunctionType = (token: string) => Promise<bigint>;
 
+type ClaimTokensFunctionType = (
+  tokens: string[],
+  callbacks: CallbackOptionsType
+) => Promise<void>;
+
 type UseControllerReturnType = {
   addAllowedRewardTokens: Ref<AddAllowedRewardTokensFunctionType | undefined>;
   depositToken: Ref<DepositTokenFunctionType | undefined>;
   approveToken: Ref<ApproveTokenFunctionType | undefined>;
   tokenAllowance: Ref<TokenAllowanceFunctionType | undefined>;
+  claimTokens: Ref<ClaimTokensFunctionType | undefined>;
 };
 
 const ERC20 = [
@@ -39,6 +45,7 @@ const ERC20 = [
 const RewardDistributorABI = [
   'function addAllowedRewardTokens(address[] calldata tokens) external',
   'function depositToken(address token, uint256 amount) external',
+  'function claimTokens(address user, address[] calldata tokens) returns (uint256[])',
 ];
 
 export const useController = ({
@@ -62,6 +69,7 @@ export const useController = ({
   const depositToken = ref<DepositTokenFunctionType>();
   const approveToken = ref<ApproveTokenFunctionType>();
   const tokenAllowance = ref<TokenAllowanceFunctionType>();
+  const claimTokens = ref<ClaimTokensFunctionType>();
 
   const initialize = () => {
     addAllowedRewardTokens.value = async (
@@ -161,6 +169,34 @@ export const useController = ({
 
       return await contract.allowance(owner, spender);
     };
+
+    claimTokens.value = async (
+      tokens: string[],
+      callbacks: CallbackOptionsType
+    ): Promise<void> => {
+      if (!walletProvider.value) return;
+      if (!veSystem.value) return;
+
+      const contractAddress = veSystem.value.rewardDistributorAddress;
+
+      const provider = new BrowserProvider(
+        walletProvider.value,
+        network.value.id
+      );
+      const signer = await provider.getSigner();
+      const contract = new ethers.Contract(
+        contractAddress,
+        RewardDistributorABI,
+        signer
+      );
+
+      const user = await signer.getAddress();
+
+      await submitAction(
+        async () => await contract.claimTokens(user, tokens),
+        callbacks
+      );
+    };
   };
 
   watch([network], initialize);
@@ -170,5 +206,6 @@ export const useController = ({
     depositToken,
     approveToken,
     tokenAllowance,
+    claimTokens,
   };
 };

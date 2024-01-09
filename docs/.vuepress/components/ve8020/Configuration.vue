@@ -7,6 +7,7 @@ import { useNetwork } from '../../providers/network';
 import { useController } from '../../utils/VotingEscrowController';
 import { useController as useTokenController } from '../../utils/TokenController';
 import { useController as useLensRewardController } from '../../utils/LensRewardController';
+import { useController as useRewardsDistributorController } from '../../utils/RewardsDistributionController';
 import LockModal from './LockModal.vue';
 import ClaimModal from './ClaimModal.vue';
 import WithdrawModal from './WithdrawModal.vue';
@@ -27,6 +28,12 @@ const { allowance, approve } = useTokenController({
 });
 
 const { getUserClaimableRewardsAll } = useLensRewardController({
+  walletProvider,
+  network,
+  veSystem,
+});
+
+const { claimTokens } = useRewardsDistributorController({
   walletProvider,
   network,
   veSystem,
@@ -84,6 +91,8 @@ const tokens = computed(() => {
 const isLoadingLock = ref<boolean>(false);
 const isLoadingApprove = ref<boolean>(false);
 const isLoadingWithdraw = ref<boolean>(false);
+const isLoadingClaim = ref<boolean>(false);
+
 const isLockModalOpen = ref<boolean>(false);
 const isWithdrawModalOpen = ref<boolean>(false);
 const isClaimModalOpen = ref<boolean>(false);
@@ -112,8 +121,25 @@ const handleClaimModalOpen = () => {
   isClaimModalOpen.value = true;
 };
 
-const handleClaim = (tokens: string[]) => {
-  console.log('claim', tokens);
+const handleClaim = async (tokens: string[]) => {
+  await claimTokens.value?.(tokens, {
+    onPrompt: () => {
+      console.log('onPrompt');
+      isClaimModalOpen.value = false;
+    },
+    onSubmitted: ({ tx }) => {
+      console.log('onSubmitted', tx);
+      isLoadingClaim.value = true;
+    },
+    onSuccess: async ({ receipt }) => {
+      console.log('onSuccess', receipt);
+      isLoadingClaim.value = false;
+    },
+    onError: err => {
+      console.log('err', err);
+      isLoadingClaim.value = false;
+    },
+  });
 };
 
 const handleWithdraw = async () => {
@@ -292,7 +318,13 @@ const formFields = computed(() => {
             :onClose="handleClaimModalClose"
             :onSubmit="handleClaim"
           />
-          <button class="btn" @click="handleClaimModalOpen">Claim</button>
+          <button
+            class="btn"
+            :disabled="isLoadingClaim"
+            @click="handleClaimModalOpen"
+          >
+            {{ isLoadingClaim ? 'Claiming...' : 'Claim' }}
+          </button>
         </div>
       </article>
     </section>
