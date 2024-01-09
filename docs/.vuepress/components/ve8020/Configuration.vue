@@ -41,16 +41,20 @@ const fetchAllowance = async (ve: VeSystem) => {
   tokenAllowance.value = result ? parseFloat(ethers.formatEther(result)) : 0;
 };
 
-watch(veSystem, async ve => {
-  if (!ve) return;
-
-  await fetchAllowance(ve);
+const fetchClaimableRewards = async () => {
   const result = await getUserClaimableRewardsAll.value?.();
 
   claimableRewards.value = result?.reduce(
     (m, v) => ({ ...m, [v[0].toLowerCase()]: v[1] }),
     {}
   );
+};
+
+watch(veSystem, async ve => {
+  if (!ve) return;
+
+  await fetchAllowance(ve);
+  await fetchClaimableRewards();
 });
 
 const tokens = computed(() => {
@@ -58,6 +62,8 @@ const tokens = computed(() => {
   if (!claimableRewards.value) return [];
 
   const claimableAmounts = claimableRewards.value;
+
+  if (Object.keys(claimableAmounts).length === 0) return [];
 
   return veSystem.value.rewardDistributor.rewardTokens.map(
     ({ address, name, decimals }) => {
