@@ -218,21 +218,6 @@ const formFields = computed(() => {
     },
   ];
 });
-
-const monedas = [
-  {
-    token: 'token1',
-    claimableAmount: '1542',
-  },
-  {
-    token: 'token1fgh',
-    claimableAmount: '1542fhfh',
-  },
-  {
-    token: 'token1fg',
-    claimableAmount: '1542fg',
-  },
-];
 </script>
 
 <template>
@@ -285,7 +270,7 @@ const monedas = [
         <div>
           <ClaimModal
             :open="isClaimModalOpen"
-            :tokens="monedas"
+            :tokens="tokens"
             :onClose="handleClaimModalClose"
             :onSubmit="handleClaim"
           />
