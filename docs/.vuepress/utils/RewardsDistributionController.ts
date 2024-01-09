@@ -24,35 +24,11 @@ type ApproveTokenFunctionType = DepositTokenFunctionType;
 
 type TokenAllowanceFunctionType = (token: string) => Promise<bigint>;
 
-type DepositEqualWeeksPeriodParamsType = {
-  token: string;
-  amount: bigint;
-  weeks: bigint;
-};
-
-type DepositEqualWeeksPeriodFunctionType = (
-  data: DepositEqualWeeksPeriodParamsType,
-  callbacks: CallbackOptionsType
-) => Promise<void>;
-
-type DepositExactWeekParamsType = {
-  token: string;
-  amount: bigint;
-  weekTimestamp: bigint;
-};
-
-type DepositExactWeekFunctionType = (
-  data: DepositExactWeekParamsType,
-  callbacks: CallbackOptionsType
-) => Promise<void>;
-
 type UseControllerReturnType = {
   addAllowedRewardTokens: Ref<AddAllowedRewardTokensFunctionType | undefined>;
   depositToken: Ref<DepositTokenFunctionType | undefined>;
   approveToken: Ref<ApproveTokenFunctionType | undefined>;
   tokenAllowance: Ref<TokenAllowanceFunctionType | undefined>;
-  depositEqualWeeksPeriod: Ref<DepositEqualWeeksPeriodFunctionType | undefined>;
-  depositExactWeek: Ref<DepositExactWeekFunctionType | undefined>;
 };
 
 const ERC20 = [
@@ -63,11 +39,6 @@ const ERC20 = [
 const RewardDistributorABI = [
   'function addAllowedRewardTokens(address[] calldata tokens) external',
   'function depositToken(address token, uint256 amount) external',
-];
-
-const RewardFaucetABI = [
-  'function depositEqualWeeksPeriod(address token, uint256 amount, uint256 weeksCount) external',
-  'function depositExactWeek(address token, uint256 amount, uint256 weekTimeStamp) external',
 ];
 
 export const useController = ({
@@ -91,8 +62,6 @@ export const useController = ({
   const depositToken = ref<DepositTokenFunctionType>();
   const approveToken = ref<ApproveTokenFunctionType>();
   const tokenAllowance = ref<TokenAllowanceFunctionType>();
-  const depositEqualWeeksPeriod = ref<DepositEqualWeeksPeriodFunctionType>();
-  const depositExactWeek = ref<DepositExactWeekFunctionType>();
 
   const initialize = () => {
     addAllowedRewardTokens.value = async (
@@ -192,66 +161,6 @@ export const useController = ({
 
       return await contract.allowance(owner, spender);
     };
-
-    depositEqualWeeksPeriod.value = async (
-      data: DepositEqualWeeksPeriodParamsType,
-      callbacks: CallbackOptionsType
-    ): Promise<void> => {
-      if (!walletProvider.value) return;
-      if (!veSystem.value) return;
-
-      // TODO: Add this field to the subgraph
-      const contractAddress = veSystem.value.rewardFaucetAddress;
-
-      const provider = new BrowserProvider(
-        walletProvider.value,
-        network.value.id
-      );
-      const signer = await provider.getSigner();
-      const contract = new ethers.Contract(
-        contractAddress,
-        RewardFaucetABI,
-        signer
-      );
-
-      const { token, amount, weeks } = data;
-
-      await submitAction(
-        async () =>
-          await contract.depositEqualWeeksPeriod(token, amount, weeks),
-        callbacks
-      );
-    };
-
-    depositExactWeek.value = async (
-      data: DepositExactWeekParamsType,
-      callbacks: CallbackOptionsType
-    ): Promise<void> => {
-      if (!walletProvider.value) return;
-      if (!veSystem.value) return;
-
-      // TODO: Add this field to the subgraph
-      const contractAddress = veSystem.value.rewardFaucetAddress;
-
-      const provider = new BrowserProvider(
-        walletProvider.value,
-        network.value.id
-      );
-      const signer = await provider.getSigner();
-      const contract = new ethers.Contract(
-        contractAddress,
-        RewardFaucetABI,
-        signer
-      );
-
-      const { token, amount, weekTimestamp } = data;
-
-      await submitAction(
-        async () =>
-          await contract.depositExactWeek(token, amount, weekTimestamp),
-        callbacks
-      );
-    };
   };
 
   watch([network], initialize);
@@ -261,7 +170,5 @@ export const useController = ({
     depositToken,
     approveToken,
     tokenAllowance,
-    depositEqualWeeksPeriod,
-    depositExactWeek,
   };
 };
