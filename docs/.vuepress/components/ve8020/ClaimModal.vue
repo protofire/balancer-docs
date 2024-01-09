@@ -127,13 +127,13 @@ const toggleSelectAll = () => {
 }
 
 @media (max-width: 850px) {
-  .modal-popup {
+  .modal-popup.claim {
     left: calc(50% - 250px);
   }
 }
 
 @media (max-width: 555px) {
-  .modal-container .modal-popup {
+  .modal-popup.claim {
     left: 5%;
     top: 250px;
   }
