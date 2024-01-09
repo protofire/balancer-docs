@@ -45,7 +45,9 @@ export const useController = ({
       if (!veSystem.value) return [];
 
       const distributor = veSystem.value.rewardDistributorAddress;
-      const tokens = veSystem.value.rewardDistributor.rewardTokens;
+      const tokens = veSystem.value.rewardDistributor.rewardTokens.map(
+        rt => rt.address
+      );
 
       const provider = new BrowserProvider(
         walletProvider.value,

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps, ref } from 'vue';
+import { defineProps, ref, watch, computed } from 'vue';
 
 type ClaimableTokenType = {
   token: string;
@@ -13,15 +13,34 @@ type ModalPropsType = {
   tokens: ClaimableTokenType[];
 };
 
-const props = defineProps<ModalPropsType>();
-const tokens = ref(props.tokens.map(token => ({ ...token, checked: false })));
-const toggleCheckbox = (i: number) => {
-  tokens.value[i].checked = !tokens.value[i].checked;
+type ItemType = ClaimableTokenType & {
+  checked: boolean;
 };
-const allSelected = ref(false);
+
+const items = ref<ItemType[]>();
+const props = defineProps<ModalPropsType>();
+
+watch(
+  () => props.tokens,
+  value => {
+    items.value = value.map(x => ({ ...x, checked: false }));
+  }
+);
+
+const toggleSelect = (i: number) => {
+  if (!items.value) return;
+
+  items.value[i].checked = !items.value[i].checked;
+};
+
+const allSelected = computed(() => items.value?.every(item => item.checked));
+
 const toggleSelectAll = () => {
-  allSelected.value = !allSelected.value;
-  tokens.value.forEach(token => (token.checked = allSelected.value));
+  if (!items.value) return;
+
+  const newValue = !allSelected.value;
+
+  items.value.map(token => (token.checked = newValue));
 };
 </script>
 
@@ -36,8 +55,8 @@ const toggleSelectAll = () => {
         </div>
       </div>
       <div class="body">
-        <div v-for="(item, i) in tokens" :key="item.token" class="item-row">
-          <div class="item-check" @click="toggleCheckbox(i)">
+        <div v-for="(item, i) in items" :key="item.token" class="item-row">
+          <div class="item-check" @click="toggleSelect(i)">
             <svg v-if="item.checked" width="16" height="16" class="icon">
               <use href="/images/check2-square.svg#icon"></use>
             </svg>
