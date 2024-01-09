@@ -108,15 +108,34 @@ const toggleSelectAll = () => {
   top: 300px;
 }
 
-@media (max-width: 622px) {
-  .modal-container .modal-popup {
-    left: 5%;
+@media (max-width: 1520px) {
+  .modal-popup.claim {
+    left: calc(50% - 160px);
   }
 }
 
-@media (max-height: 700px) {
-  .modal-container .modal-popup.claim {
-    top: 100px;
+@media (max-width: 1200px) {
+  .modal-popup.claim {
+    left: 35%;
+  }
+}
+
+@media (max-width: 1000px) {
+  .modal-popup.claim {
+    max-width: 500px;
+  }
+}
+
+@media (max-width: 850px) {
+  .modal-popup {
+    left: calc(50% - 250px);
+  }
+}
+
+@media (max-width: 555px) {
+  .modal-container .modal-popup {
+    left: 5%;
+    top: 250px;
   }
 }
 
