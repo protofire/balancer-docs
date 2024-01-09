@@ -75,6 +75,7 @@ const tokens = computed(() => {
       return {
         token: name,
         claimableAmount,
+        address,
       };
     }
   );
@@ -111,8 +112,8 @@ const handleClaimModalOpen = () => {
   isClaimModalOpen.value = true;
 };
 
-const handleClaim = () => {
-  console.log('claim');
+const handleClaim = (tokens: string[]) => {
+  console.log('claim', tokens);
 };
 
 const handleWithdraw = async () => {

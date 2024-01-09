@@ -4,12 +4,13 @@ import { defineProps, ref, watch, computed } from 'vue';
 type ClaimableTokenType = {
   token: string;
   claimableAmount: string;
+  address: string;
 };
 
 type ModalPropsType = {
   open: boolean;
   onClose: () => void;
-  onSubmit: () => void;
+  onSubmit: (tokens: string[]) => void;
   tokens: ClaimableTokenType[];
 };
 
@@ -42,6 +43,12 @@ const toggleSelectAll = () => {
 
   items.value.map(token => (token.checked = newValue));
 };
+
+const selectedTokens = computed<string[]>(() =>
+  items.value
+    ? items.value.filter(item => item.checked).map(item => item.address)
+    : []
+);
 </script>
 
 <template>
@@ -84,7 +91,13 @@ const toggleSelectAll = () => {
 
         <div class="btn-group">
           <button class="btn close" @click="props.onClose">Close</button>
-          <button class="btn submit">Submit</button>
+          <button
+            class="btn submit"
+            :disabled="selectedTokens.length === 0"
+            @click="onSubmit(selectedTokens)"
+          >
+            Submit
+          </button>
         </div>
       </div>
     </div>
@@ -251,5 +264,11 @@ const toggleSelectAll = () => {
   .modal-popup .btn-group {
     width: 100%;
   }
+}
+
+.modal-popup .btn-group .btn:disabled {
+  cursor: not-allowed;
+  background-color: rgba(56, 74, 255, 0.2);
+  color: grey;
 }
 </style>
