@@ -35,6 +35,7 @@ type SetEarlyUnlockPenaltyFunctionType = (
 ) => Promise<void>;
 
 type GetEarlyUnlockPenaltyFunctionType = () => Promise<bigint>;
+type GetLockedFunctionType = () => Promise<[bigint, bigint]>;
 
 type UseControllerReturnType = {
   setAllUnlock: Ref<SetAllUnlockFunctionType | undefined>;
@@ -45,6 +46,7 @@ type UseControllerReturnType = {
   getEarlyUnlockPenalty: Ref<GetEarlyUnlockPenaltyFunctionType | undefined>;
   createLock: Ref<CreateLockFunctionType | undefined>;
   withdraw: Ref<WithdrawFunctionType | undefined>;
+  getLocked: Ref<GetLockedFunctionType | undefined>;
 };
 
 const ABI = [
@@ -56,6 +58,7 @@ const ABI = [
   'function penalty_k() view external returns (uint256)',
   'function create_lock(uint256 _value, uint256 _unlock_time) external',
   'function withdraw() external',
+  'function locked(address _owner) view external returns (uint256, uint256)',
 ];
 
 export const useController = ({
@@ -83,6 +86,7 @@ export const useController = ({
   const getEarlyUnlockPenalty = ref<GetEarlyUnlockPenaltyFunctionType>();
   const createLock = ref<CreateLockFunctionType>();
   const withdraw = ref<WithdrawFunctionType>();
+  const getLocked = ref<GetLockedFunctionType>();
 
   const initialize = () => {
     setAllUnlock.value = async (
@@ -237,6 +241,24 @@ export const useController = ({
 
       await submitAction(async () => await contract.withdraw(), callbacks);
     };
+
+    getLocked.value = async (): Promise<[bigint, bigint]> => {
+      if (!walletProvider.value) return [toBigInt(0), toBigInt(0)];
+      if (!veSystem.value) return [toBigInt(0), toBigInt(0)];
+
+      const contractAddress = veSystem.value.votingEscrow.address;
+
+      const provider = new BrowserProvider(
+        walletProvider.value,
+        network.value.id
+      );
+      const signer = await provider.getSigner();
+      const contract = new ethers.Contract(contractAddress, ABI, signer);
+
+      const owner = await signer.getAddress();
+
+      return await contract.locked(owner);
+    };
   };
 
   watch([network], initialize);
@@ -250,5 +272,6 @@ export const useController = ({
     getEarlyUnlockPenalty,
     createLock,
     withdraw,
+    getLocked,
   };
 };
