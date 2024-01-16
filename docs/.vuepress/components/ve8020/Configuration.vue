@@ -22,6 +22,7 @@ const {
   withdraw,
   getLocked,
   earlyUnlock: getEarlyUnlock,
+  withdrawEarly,
 } = useController({
   walletProvider,
   network,
@@ -287,8 +288,26 @@ const handleIncreaseLock = (amount: number) => {
   console.log('increase', amount);
 };
 
-const handleEarlyWithdraw = () => {
+const handleEarlyWithdraw = async () => {
   console.log('early withdraw');
+  await withdrawEarly.value?.({
+    onPrompt: () => {
+      console.log('onPrompt');
+      isEarlyWithdrawModalOpen.value = false;
+    },
+    onSubmitted: ({ tx }) => {
+      console.log('onSubmitted', tx);
+      isLoadingWithdraw.value = true;
+    },
+    onSuccess: async ({ receipt }) => {
+      console.log('onSuccess', receipt);
+      isLoadingWithdraw.value = false;
+    },
+    onError: err => {
+      console.log('err', err);
+      isLoadingWithdraw.value = false;
+    },
+  });
 };
 
 const formFields = computed(() => {
@@ -426,7 +445,7 @@ const formFields = computed(() => {
           <button
             v-if="lockEndTime <= currentTimeInSeconds"
             class="btn"
-            :disabled="isLoadingWithdraw"
+            :disabled="isLoadingWithdraw || lockAmount === ethers.toBigInt(0)"
             @click="handleWithdrawModalOpen"
           >
             {{ isLoadingWithdraw ? 'Withdrawing...' : 'Withdraw' }}
@@ -437,7 +456,7 @@ const formFields = computed(() => {
             :disabled="isLoadingWithdraw || !earlyUnlock"
             @click="handleEarlyWithdrawModalOpen"
           >
-            Early Withdraw
+            {{ isLoadingWithdraw ? 'Withdrawing...' : 'Early Withdraw' }}
           </button>
         </div>
         <div>
