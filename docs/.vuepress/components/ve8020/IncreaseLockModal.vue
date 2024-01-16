@@ -41,6 +41,7 @@ const amount = computed<number>(() =>
               placeholder="12000"
             />
           </div>
+          <button class="btn submit">Submit</button>
         </div>
       </div>
       <div class="btn-group">
