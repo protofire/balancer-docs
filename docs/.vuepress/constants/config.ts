@@ -6,7 +6,7 @@ type Config = {
 
 export const CONFIG = new Map<number, Config>([
   [
-    80001,
+    80001, // mumbai
     {
       SUBGRAPH_URL:
         'https://api.thegraph.com/subgraphs/name/maxkmyt/launchpad_test_1',
@@ -15,28 +15,27 @@ export const CONFIG = new Map<number, Config>([
     },
   ],
   [
-    42161,
+    42161, // arb
     {
       SUBGRAPH_URL:
-        'https://api.thegraph.com/subgraphs/name/maxkmyt/launchpad_test_1',
+        'https://thegraph.com/explorer/subgraph/maxkmyt/launchpad_arb',
       LAUNCHPAD_CONTRACT: '0x6c9c2881b6e2fdb4e9e72896a4883049ad155b36',
       LENS_REWARD_CONTRACT: '0xb422e74045f19d94ec62236efdcae4b13bac386b',
     },
   ],
   [
-    1101,
+    1101, // polygon zkEVM
     {
-      SUBGRAPH_URL:
-        'https://api.thegraph.com/subgraphs/name/maxkmyt/launchpad_test_1',
+      SUBGRAPH_URL: '',
       LAUNCHPAD_CONTRACT: '0x6c9c2881b6e2fdb4e9e72896a4883049ad155b36',
       LENS_REWARD_CONTRACT: '0xb422e74045f19d94ec62236efdcae4b13bac386b',
     },
   ],
   [
-    137,
+    137, // polygon pos
     {
       SUBGRAPH_URL:
-        'https://api.thegraph.com/subgraphs/name/maxkmyt/launchpad_test_1',
+        'https://thegraph.com/explorer/subgraph/maxkmyt/launchpad_polygon',
       LAUNCHPAD_CONTRACT: '0x6c9c2881b6e2fdb4e9e72896a4883049ad155b36',
       LENS_REWARD_CONTRACT: '0xb422e74045f19d94ec62236efdcae4b13bac386b',
     },
