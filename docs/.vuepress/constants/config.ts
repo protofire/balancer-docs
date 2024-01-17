@@ -26,7 +26,8 @@ export const CONFIG = new Map<number, Config>([
   [
     1101, // polygon zkEVM
     {
-      SUBGRAPH_URL: 'https://subgraph.satsuma-prod.com/23d030b3f9c5/maksims-team--1931238/launchpad_polygon_zk/api',
+      SUBGRAPH_URL:
+        'https://subgraph.satsuma-prod.com/23d030b3f9c5/maksims-team--1931238/launchpad_polygon_zk/api',
       LAUNCHPAD_CONTRACT: '0x6c9c2881b6e2fdb4e9e72896a4883049ad155b36',
       LENS_REWARD_CONTRACT: '0xb422e74045f19d94ec62236efdcae4b13bac386b',
     },
