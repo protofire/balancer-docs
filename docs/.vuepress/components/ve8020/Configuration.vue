@@ -23,6 +23,8 @@ const {
   getLocked,
   earlyUnlock: getEarlyUnlock,
   withdrawEarly,
+  increaseLockAmount,
+  increaseLockTime,
 } = useController({
   walletProvider,
   network,
@@ -284,12 +286,57 @@ const handleLock = async (amount: number, lockTime: number) => {
   );
 };
 
-const handleIncreaseLock = (amount: number) => {
+const handleIncreaseLock = async (amount: number) => {
   console.log('increase', amount);
+  if (!veSystem.value) return;
+
+  const decimals = veSystem.value?.votingEscrow.decimals;
+
+  await increaseLockAmount.value?.(
+    ethers.parseUnits(amount.toString(), decimals),
+    {
+      onPrompt: () => {
+        console.log('onPrompt');
+        isIncreaseLockModalOpen.value = false;
+      },
+      onSubmitted: ({ tx }) => {
+        console.log('onSubmitted', tx);
+        isLoadingLock.value = true;
+      },
+      onSuccess: async ({ receipt }) => {
+        console.log('onSuccess', receipt);
+        isLoadingLock.value = false;
+      },
+      onError: err => {
+        console.log('err', err);
+        isLoadingLock.value = false;
+      },
+    }
+  );
 };
 
-const handleIncreaseReleaseTime = (releaseTime: number) => {
+const handleIncreaseReleaseTime = async (releaseTime: number) => {
   console.log('releaseTime', releaseTime);
+  if (!veSystem.value) return;
+
+  await increaseLockTime.value?.(ethers.toBigInt(releaseTime), {
+    onPrompt: () => {
+      console.log('onPrompt');
+      isIncreaseLockModalOpen.value = false;
+    },
+    onSubmitted: ({ tx }) => {
+      console.log('onSubmitted', tx);
+      isLoadingLock.value = true;
+    },
+    onSuccess: async ({ receipt }) => {
+      console.log('onSuccess', receipt);
+      isLoadingLock.value = false;
+    },
+    onError: err => {
+      console.log('err', err);
+      isLoadingLock.value = false;
+    },
+  });
 };
 
 const handleEarlyWithdraw = async () => {
