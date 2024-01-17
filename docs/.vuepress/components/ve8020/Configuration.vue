@@ -459,15 +459,21 @@ const formFields = computed(() => {
             :onApprove="handleApprove"
             :isLoadingApprove="isLoadingApprove"
           />
-          <button
+          <!-- <button
             v-if="lockAmount === ethers.toBigInt(0)"
             class="btn"
             :disabled="isLoadingLock"
             @click="handleLockModalOpen"
+          > -->
+          <button
+            v-if="lockAmount === ethers.toBigInt(0)"
+            class="btn"
+            :disabled="isLoadingLock"
+            @click="handleIncreaseLockModalOpen"
           >
             {{ isLoadingLock ? 'Locking...' : 'Lock' }}
           </button>
-          <button
+          <!-- <button
             v-if="lockAmount > ethers.toBigInt(0)"
             class="btn"
             :disabled="
@@ -475,6 +481,15 @@ const formFields = computed(() => {
               parseInt(lockEndTime.toString()) > currentTimeInSeconds
             "
             @click="handleIncreaseLockModalOpen"
+          > -->
+          <button
+            v-if="lockAmount > ethers.toBigInt(0)"
+            class="btn"
+            :disabled="
+              isLoadingLock ||
+              parseInt(lockEndTime.toString()) > currentTimeInSeconds
+            "
+            @click="handleLockModalOpen"
           >
             Increase Lock
           </button>

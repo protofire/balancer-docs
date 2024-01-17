@@ -218,6 +218,24 @@ input[type='number'] {
   background-color: rgba(56, 74, 255, 0.2);
 }
 
+.item-row .btn.submit {
+  width: 90px;
+  height: 40px;
+  background-color: #384aff;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  font-weight: 600;
+  font-size: 14px;
+  color: #ffffff;
+}
+
+.item-row .btn.submit:disabled {
+  cursor: not-allowed;
+  background-color: rgba(56, 74, 255, 0.2);
+  color: grey;
+}
+
 .modal-popup .btn-group {
   display: flex;
   align-items: center;
