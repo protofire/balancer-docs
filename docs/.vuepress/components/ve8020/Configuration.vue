@@ -288,6 +288,10 @@ const handleIncreaseLock = (amount: number) => {
   console.log('increase', amount);
 };
 
+const handleIncreaseReleaseTime = (releaseTime: number) => {
+  console.log('releaseTime', releaseTime);
+};
+
 const handleEarlyWithdraw = async () => {
   console.log('early withdraw');
   await withdrawEarly.value?.({
@@ -402,7 +406,8 @@ const formFields = computed(() => {
           <IncreaseLockModal
             :open="isIncreaseLockModalOpen"
             :onClose="handleIncreaseLockModalClose"
-            :onSubmit="handleIncreaseLock"
+            :onIncreaseLock="handleIncreaseLock"
+            :onIncreaseReleaseTime="handleIncreaseReleaseTime"
             :allowance="tokenAllowance"
             :onApprove="handleApprove"
             :isLoadingApprove="isLoadingApprove"

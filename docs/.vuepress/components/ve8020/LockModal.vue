@@ -16,10 +16,6 @@ const props = defineProps<ModalPropsType>();
 const amountInput = ref<string>('');
 const releaseTimeInput = ref<string>('');
 
-watch(releaseTimeInput, value => {
-  console.log('releaseTimeInput', value);
-});
-
 watch(
   () => props.open,
   () => {

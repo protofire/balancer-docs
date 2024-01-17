@@ -1,18 +1,21 @@
 <script setup lang="ts">
 import { defineProps, ref, computed, watch } from 'vue';
+import { dateToSeconds } from '../../utils';
 
 type ModalPropsType = {
   open: boolean;
   allowance: number;
   isLoadingApprove: boolean;
   onClose: () => void;
-  onSubmit: (amount: number) => void;
+  onIncreaseLock: (amount: number) => void;
+  onIncreaseReleaseTime: (releaseTime: number) => void;
   onApprove: (amount: number) => void;
 };
 
 const props = defineProps<ModalPropsType>();
 
 const amountInput = ref<string>('');
+const releaseTimeInput = ref<string>('');
 
 watch(
   () => props.open,
@@ -24,15 +27,23 @@ watch(
 const amount = computed<number>(() =>
   amountInput.value === '' ? 0 : parseFloat(amountInput.value)
 );
+
+const releaseTime = computed<number>(() => {
+  if (releaseTimeInput.value === '') return 0;
+
+  const d = new Date(releaseTimeInput.value);
+
+  return dateToSeconds(d);
+});
 </script>
 
 <template>
   <div v-if="props.open" class="modal-container">
     <div class="modal-popup early-penalty">
-      <h3 class="modal-title">Increase Token Amount</h3>
+      <h3 class="modal-title">Increase Lock</h3>
       <div class="body">
         <div class="item-row">
-          <p class="item-name">Underlying 8020 BPT Amount</p>
+          <p class="item-name">Amount</p>
           <div class="input-group">
             <input
               v-model="amountInput"
@@ -41,27 +52,43 @@ const amount = computed<number>(() =>
               placeholder="12000"
             />
           </div>
-          <button class="btn submit">Submit</button>
+          <button
+            v-show="allowance >= amount"
+            class="btn submit"
+            :disabled="amountInput === ''"
+            @click="onIncreaseLock(amount)"
+          >
+            Submit
+          </button>
+          <button
+            v-show="allowance < amount"
+            class="btn submit approve"
+            :disabled="props.isLoadingApprove"
+            @click="onApprove(amount)"
+          >
+            {{ isLoadingApprove ? 'Approving' : 'Approve' }}
+          </button>
+        </div>
+        <div class="item-row">
+          <p class="item-name">Release time</p>
+          <div class="input-group">
+            <input
+              v-model="releaseTimeInput"
+              type="datetime-local"
+              class="input"
+            />
+          </div>
+          <button
+            class="btn submit"
+            :disabled="releaseTimeInput === ''"
+            @click="onIncreaseReleaseTime(releaseTime)"
+          >
+            Submit
+          </button>
         </div>
       </div>
       <div class="btn-group">
         <button class="btn close" @click="props.onClose">Close</button>
-        <button
-          v-show="allowance >= amount"
-          class="btn submit"
-          :disabled="amountInput === ''"
-          @click="onSubmit(amount)"
-        >
-          Submit
-        </button>
-        <button
-          v-show="allowance < amount"
-          class="btn submit approve"
-          :disabled="props.isLoadingApprove"
-          @click="onApprove(amount)"
-        >
-          {{ isLoadingApprove ? 'Approving' : 'Approve' }}
-        </button>
       </div>
     </div>
   </div>
