@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { defineProps, ref, computed, watch } from 'vue';
+import { locale2utc } from '../../utils';
 
 type ModalPropsType = {
   open: boolean;
@@ -14,14 +15,6 @@ const props = defineProps<ModalPropsType>();
 
 const amountInput = ref<string>('');
 const releaseTimeInput = ref<string>('');
-
-const locale2utc = (date: Date): number => {
-  if (date.getTimezoneOffset() < 0) {
-    return date.getTime() - date.getTimezoneOffset() * 60e3;
-  }
-
-  return date.getTime() + date.getTimezoneOffset() * 60e3;
-};
 
 watch(
   () => props.open,
