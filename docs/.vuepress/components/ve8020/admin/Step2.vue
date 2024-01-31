@@ -4,7 +4,7 @@ import { provideNetwork } from '../../../providers/network';
 import { provideVeSystem } from '../../../providers/veSystem';
 
 import Wallet from '../../Navbar/Wallet.vue';
-import Launchpad from '../Launchpad.vue';
+import Launchpad from './Launchpad.vue';
 
 const NetworkProvider = createProviderComponent(() => provideNetwork());
 const VeSystemProvider = createProviderComponent(() => provideVeSystem());
