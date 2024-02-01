@@ -15,6 +15,8 @@ export const poolsProvider = () => {
   });
 
   async function initPools() {
+    if (!network.value) return;
+
     if (network.value.id === 11155111) {
       await initSepoliaPools();
     } else {
@@ -63,10 +65,27 @@ export const poolsProvider = () => {
     return pools.value.find(pool => pool.id === id);
   }
 
+  async function fetchPoolsByAddressOrSymbol(addressOrSymbol: string) {
+    isLoading.value = true;
+
+    const poolProvider = new BalancerSubgraph(
+      'https://api.studio.thegraph.com/query/24660/balancer-sepolia-v2/version/latest'
+    );
+
+    const _pools = await poolProvider.getPoolsByAddressOrSymbol(
+      addressOrSymbol
+    );
+
+    pools.value = _pools;
+
+    isLoading.value = false;
+  }
+
   return {
     pools,
     getPoolByID,
     isLoading,
+    fetchPoolsByAddressOrSymbol,
   };
 };
 

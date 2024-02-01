@@ -11,6 +11,7 @@ type SelectorProps = {
   tokens: TokenType[];
   value?: TokenType;
   onChange: (value: TokenType) => void;
+  onSearch: (value: string) => void;
 };
 
 const props = defineProps<SelectorProps>();
@@ -31,14 +32,6 @@ watch(
     selected.value = value;
   }
 );
-
-const searchTokens = (text: string) => {
-  filteredTokens.value = props.tokens.filter(
-    x =>
-      x.symbol.toLowerCase().includes(text.toLowerCase()) ||
-      x.address.toLowerCase() === text.toLowerCase()
-  );
-};
 </script>
 <template>
   <Select :onChange="onChange" :value="selected">
@@ -50,7 +43,7 @@ const searchTokens = (text: string) => {
       v-slot="token"
       :options="filteredTokens"
       optionKey="address"
-      :searchFn="searchTokens"
+      :searchFn="onSearch"
     >
       <Avatar :address="token.address" :size="20" />
       <span>{{ token.symbol }}</span>

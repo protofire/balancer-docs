@@ -3,13 +3,17 @@ import { ref, watch, computed } from 'vue';
 import Calendar from '../Calendar.vue';
 import { useWeb3ModalProvider } from '@web3modal/ethers/vue';
 import { useNetwork } from '../../../providers/network';
-import { locale2utc, useController } from '../../../utils';
+import { debounce, locale2utc, useController } from '../../../utils';
 import Tooltip from './Tooltip.vue';
 import { rewardDistributionStartTimeHint } from '../../../constants/hints';
 import TokenSelector, { TokenType } from './TokenSelector.vue';
 import { usePools } from '../../../providers/pools';
 
-const { pools } = usePools();
+const {
+  pools,
+  fetchPoolsByAddressOrSymbol,
+  isLoading: isLoadingPools,
+} = usePools();
 const { network } = useNetwork();
 const { walletProvider } = useWeb3ModalProvider();
 
@@ -167,16 +171,23 @@ const handleTokenChange = (value: TokenType) => {
   selectedPool.value = value;
   bptAddress.value = value.address;
 };
+
+const handleTokenSearch = debounce(async (value: string) => {
+  await fetchPoolsByAddressOrSymbol(value);
+}, 500);
 </script>
 
 <template>
   <form class="section-container" @submit.prevent="handleSubmit">
     <div key="bptAddress" class="item-row">
-      <p class="item-name">Select BPT Token</p>
+      <p class="item-name">
+        Select BPT Token {{ isLoadingPools ? '(loading)' : '' }}
+      </p>
       <div class="select">
         <TokenSelector
           :tokens="pools"
           :onChange="handleTokenChange"
+          :onSearch="handleTokenSearch"
           :value="selectedPool"
         />
       </div>
