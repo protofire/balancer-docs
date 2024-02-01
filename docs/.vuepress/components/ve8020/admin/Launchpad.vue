@@ -7,7 +7,7 @@ import { debounce, locale2utc, useController } from '../../../utils';
 import Tooltip from './Tooltip.vue';
 import { rewardDistributionStartTimeHint } from '../../../constants/hints';
 import TokenSelector, { TokenType } from './TokenSelector.vue';
-import { usePools } from '../../../providers/pools';
+import { usePools } from '../../../providers/balancerPools';
 
 const {
   pools,

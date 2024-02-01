@@ -2,21 +2,21 @@
 import { createProviderComponent } from '../../../providers/createProviderComponent';
 import { provideNetwork } from '../../../providers/network';
 import { provideVeSystem } from '../../../providers/veSystem';
-import { providePools } from '../../../providers/pools';
+import { provideBalancerPools } from '../../../providers/balancerPools';
 
 import Wallet from '../../Navbar/Wallet.vue';
 import Launchpad from './Launchpad.vue';
 
 const NetworkProvider = createProviderComponent(() => provideNetwork());
 const VeSystemProvider = createProviderComponent(() => provideVeSystem());
-const GlobalProvider = createProviderComponent(() => {
-  providePools();
+const BalancerPoolsProvider = createProviderComponent(() => {
+  provideBalancerPools();
 });
 </script>
 
 <template>
   <NetworkProvider>
-    <GlobalProvider>
+    <BalancerPoolsProvider>
       <VeSystemProvider>
         <div class="network-select">
           <Wallet />
@@ -27,7 +27,7 @@ const GlobalProvider = createProviderComponent(() => {
           </div>
         </div>
       </VeSystemProvider>
-    </GlobalProvider>
+    </BalancerPoolsProvider>
   </NetworkProvider>
 </template>
 

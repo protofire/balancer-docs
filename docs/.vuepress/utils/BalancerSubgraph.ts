@@ -1,6 +1,5 @@
 import {
   ApolloClient,
-  DocumentNode,
   InMemoryCache,
   NormalizedCacheObject,
   gql,
