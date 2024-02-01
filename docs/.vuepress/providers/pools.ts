@@ -2,6 +2,7 @@ import { InjectionKey, provide, onBeforeMount, ref, watch } from 'vue';
 import { RawPool, SubgraphPoolProvider } from '@balancer/sdk';
 import { safeInject } from './inject';
 import { useNetwork } from './network';
+import { BalancerSubgraph } from '../utils/BalancerSubgraph';
 
 export const poolsProvider = () => {
   const { network } = useNetwork();
@@ -14,6 +15,14 @@ export const poolsProvider = () => {
   });
 
   async function initPools() {
+    if (network.value.id === 11155111) {
+      await initSepoliaPools();
+    } else {
+      await initSdkPools();
+    }
+  }
+
+  async function initSdkPools() {
     isLoading.value = true;
 
     const poolProvider = new SubgraphPoolProvider(network.value.id, undefined, {
@@ -28,6 +37,20 @@ export const poolsProvider = () => {
       // @ts-ignore
       return parseFloat(b.totalLiquidity) - parseFloat(a.totalLiquidity);
     });
+
+    isLoading.value = false;
+  }
+
+  async function initSepoliaPools() {
+    isLoading.value = true;
+
+    const poolProvider = new BalancerSubgraph(
+      'https://api.studio.thegraph.com/query/24660/balancer-sepolia-v2/version/latest'
+    );
+
+    const _pools = await poolProvider.getPools();
+
+    pools.value = _pools;
 
     isLoading.value = false;
   }

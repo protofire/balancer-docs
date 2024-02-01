@@ -15,8 +15,15 @@ type SelectorProps = {
 
 const props = defineProps<SelectorProps>();
 
-const filteredTokens = ref(props.tokens);
+const filteredTokens = ref();
 const selected = ref<TokenType>();
+
+watch(
+  () => props.tokens,
+  value => {
+    filteredTokens.value = value;
+  }
+);
 
 watch(
   () => props.value,

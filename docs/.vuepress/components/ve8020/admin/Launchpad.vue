@@ -7,7 +7,9 @@ import { locale2utc, useController } from '../../../utils';
 import Tooltip from './Tooltip.vue';
 import { rewardDistributionStartTimeHint } from '../../../constants/hints';
 import TokenSelector, { TokenType } from './TokenSelector.vue';
+import { usePools } from '../../../providers/pools';
 
+const { pools } = usePools();
 const { network } = useNetwork();
 const { walletProvider } = useWeb3ModalProvider();
 
@@ -158,33 +160,6 @@ watch([selectedDate, computedLockTime], () => {
   lockTime.value = computedLockTime.value;
   validateForm();
 });
-
-const pools = ref([
-  {
-    symbol: '80USDC-20DAI',
-    address: '0x0000000000000000000000000000000000000001',
-  },
-  {
-    symbol: '80USDT-20ETH',
-    address: '0x0000000000000000000000000000000000000002',
-  },
-  {
-    symbol: '80GPX-20BAT',
-    address: '0x0000000000000000000000000000000000000003',
-  },
-  {
-    symbol: '80WBTC-20USDT',
-    address: '0x0000000000000000000000000000000000000004',
-  },
-  {
-    symbol: '80GHO-20GLD',
-    address: '0x0000000000000000000000000000000000000005',
-  },
-  {
-    symbol: '80AVE-20PAX',
-    address: '0x0000000000000000000000000000000000000006',
-  },
-]);
 
 const selectedPool = ref<TokenType>();
 
