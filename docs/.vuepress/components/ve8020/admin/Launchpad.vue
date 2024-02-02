@@ -180,15 +180,14 @@ const handleTokenSearch = debounce(async (value: string) => {
 <template>
   <form class="section-container" @submit.prevent="handleSubmit">
     <div key="bptAddress" class="item-row">
-      <p class="item-name">
-        Select BPT Token {{ isLoadingPools ? '(loading)' : '' }}
-      </p>
-      <div class="select">
+      <p class="item-name">Select BPT Token</p>
+      <div class="token-select">
         <TokenSelector
           :tokens="pools"
           :onChange="handleTokenChange"
           :onSearch="handleTokenSearch"
           :value="selectedPool"
+          :loading="isLoadingPools"
         />
       </div>
     </div>
@@ -477,5 +476,9 @@ input[type='number'] {
 .submit-button:disabled {
   background-color: rgba(56, 74, 255, 0.2);
   cursor: not-allowed;
+}
+
+.token-select {
+  width: 340px;
 }
 </style>

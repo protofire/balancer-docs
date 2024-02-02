@@ -12,6 +12,7 @@ type SelectorProps = {
   value?: TokenType;
   onChange: (value: TokenType) => void;
   onSearch: (value: string) => void;
+  loading?: boolean;
 };
 
 const props = defineProps<SelectorProps>();
@@ -44,9 +45,16 @@ watch(
       :options="filteredTokens"
       optionKey="address"
       :searchFn="onSearch"
+      :loading="loading"
     >
       <Avatar :address="token.address" :size="20" />
       <span>{{ token.symbol }}</span>
     </SelectOptions>
   </Select>
 </template>
+
+<style>
+.token-select ul.menu {
+  width: 340px;
+}
+</style>
