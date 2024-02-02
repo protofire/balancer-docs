@@ -103,6 +103,7 @@ const clearForm = () => {
   selectedYearsValue.value = '';
   enableEarlyUnlock.value = false;
   enableUnlockAll.value = false;
+  selectedPool.value = undefined;
 };
 
 function validateForm() {
