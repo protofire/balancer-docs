@@ -199,6 +199,7 @@ const handleTokenSearch = debounce(async (value: string) => {
           v-model="bptAddress"
           type="text"
           name="bptAddress"
+          placeholder="0xa0b...6eb48"
           class="input"
         />
       </div>
