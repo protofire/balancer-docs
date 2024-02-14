@@ -1,7 +1,7 @@
 import { Network } from '@balancer-labs/sdk';
 
 export interface NetworkConfig {
-  id: Network | 80001 | 1101 | 43114;
+  id: Network | 80001 | 1101 | 43114 | 8453;
   name: string;
   logo: string;
   explorer: string;
@@ -57,5 +57,12 @@ export const NETWORKS: NetworkConfig[] = [
     logo: '',
     explorer: 'https://snowtrace.io/',
     rpcUrl: 'https://rpc.tornadoeth.cash/avax',
+  },
+  {
+    id: 8453,
+    name: 'Base',
+    logo: '',
+    explorer: 'https://basescan.org/',
+    rpcUrl: 'https://base-pokt.nodies.app',
   },
 ];

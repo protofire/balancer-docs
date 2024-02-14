@@ -70,4 +70,13 @@ export const CONFIG = new Map<number, Config>([
       LENS_REWARD_CONTRACT: '0xe922ae35d0cd042db5bade95e50a5cb0f14fa1d9',
     },
   ],
+  [
+    8453, // base
+    {
+      SUBGRAPH_URL:
+        'https://subgraph.satsuma-prod.com/23d030b3f9c5/maksims-team--1931238/launchpad_base/api',
+      LAUNCHPAD_CONTRACT: '0x41b5b45f849a39cf7ac4aceae6c78a72e3852133',
+      LENS_REWARD_CONTRACT: '0xe922ae35d0cd042db5bade95e50a5cb0f14fa1d9',
+    },
+  ],
 ]);
