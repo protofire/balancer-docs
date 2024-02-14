@@ -1,7 +1,7 @@
 import { Network } from '@balancer-labs/sdk';
 
 export interface NetworkConfig {
-  id: Network | 80001 | 1101;
+  id: Network | 80001 | 1101 | 43114;
   name: string;
   logo: string;
   explorer: string;
@@ -50,5 +50,12 @@ export const NETWORKS: NetworkConfig[] = [
     logo: '',
     explorer: 'https://optimistic.etherscan.io/',
     rpcUrl: 'https://rpc.tornadoeth.cash/optimism',
+  },
+  {
+    id: 43114,
+    name: 'Avalanche',
+    logo: '',
+    explorer: 'https://snowtrace.io/',
+    rpcUrl: 'https://rpc.tornadoeth.cash/avax',
   },
 ];
