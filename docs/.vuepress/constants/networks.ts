@@ -9,13 +9,13 @@ export interface NetworkConfig {
 }
 
 export const NETWORKS: NetworkConfig[] = [
-  // {
-  //   id: Network.MAINNET,
-  //   name: 'Ethereum',
-  //   logo: '/images/chains/ethereum-logo.svg',
-  //   explorer: 'https://etherscan.io',
-  //   rpcUrl: 'https://eth.llamarpc.com',
-  // },
+  {
+    id: Network.MAINNET,
+    name: 'Ethereum',
+    logo: '/images/chains/ethereum-logo.svg',
+    explorer: 'https://etherscan.io',
+    rpcUrl: 'https://eth.llamarpc.com',
+  },
   {
     id: 137,
     name: 'Polygon PoS',
@@ -23,13 +23,13 @@ export const NETWORKS: NetworkConfig[] = [
     explorer: 'https://polygonscan.com',
     rpcUrl: 'https://polygon-rpc.com',
   },
-  // {
-  //   id: 1101,
-  //   name: 'Polygon zkEVM',
-  //   logo: 'https://app.balancer.fi/assets/zkevm-e64465b0.svg',
-  //   explorer: 'https://zkevm.polygonscan.com',
-  //   rpcUrl: 'https://rpc.ankr.com/polygon_zkevm',
-  // },
+  {
+    id: 1101,
+    name: 'Polygon zkEVM',
+    logo: 'https://app.balancer.fi/assets/zkevm-e64465b0.svg',
+    explorer: 'https://zkevm.polygonscan.com',
+    rpcUrl: 'https://rpc.ankr.com/polygon_zkevm',
+  },
   {
     id: 42161,
     name: 'Arbitrum',
@@ -43,5 +43,12 @@ export const NETWORKS: NetworkConfig[] = [
     logo: '/images/chains/polygon-pos-logo.svg',
     explorer: 'https://mumbai.polygonscan.com',
     rpcUrl: 'https://rpc-mumbai.maticvigil.com',
+  },
+  {
+    id: Network.OPTIMISM,
+    name: 'Optimism',
+    logo: '',
+    explorer: 'https://optimistic.etherscan.io/',
+    rpcUrl: 'https://rpc.tornadoeth.cash/optimism',
   },
 ];

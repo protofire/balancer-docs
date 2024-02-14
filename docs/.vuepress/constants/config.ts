@@ -1,3 +1,5 @@
+import { Network } from '@balancer-labs/sdk';
+
 type Config = {
   SUBGRAPH_URL: string;
   LAUNCHPAD_CONTRACT: string;
@@ -15,7 +17,7 @@ export const CONFIG = new Map<number, Config>([
     },
   ],
   [
-    42161, // arb
+    Network.ARBITRUM,
     {
       SUBGRAPH_URL:
         'https://api.thegraph.com/subgraphs/name/maxkmyt/launchpad_arb',
@@ -33,12 +35,30 @@ export const CONFIG = new Map<number, Config>([
     },
   ],
   [
-    137, // polygon pos
+    Network.POLYGON,
     {
       SUBGRAPH_URL:
         'https://api.thegraph.com/subgraphs/name/maxkmyt/launchpad_polygon',
       LAUNCHPAD_CONTRACT: '0x93a6a2c89022e60a94986621ca8a3cd45e31dc77',
       LENS_REWARD_CONTRACT: '0xb422e74045f19d94ec62236efdcae4b13bac386b',
+    },
+  ],
+  [
+    Network.OPTIMISM,
+    {
+      SUBGRAPH_URL:
+        'https://api.thegraph.com/subgraphs/name/maxkmyt/launchpad_optimism',
+      LAUNCHPAD_CONTRACT: '0xc0974a19ccb5b6e07a8fa7cd8616aa76c4cd76e7',
+      LENS_REWARD_CONTRACT: '0xe922ae35d0cd042db5bade95e50a5cb0f14fa1d9',
+    },
+  ],
+  [
+    Network.MAINNET,
+    {
+      SUBGRAPH_URL:
+        'https://api.thegraph.com/subgraphs/name/maxkmyt/launchpad_main',
+      LAUNCHPAD_CONTRACT: '0x41b5b45f849a39CF7ac4aceAe6C78A72e3852133',
+      LENS_REWARD_CONTRACT: '0xe922aE35d0cd042dB5bADe95e50A5cB0F14fa1d9',
     },
   ],
 ]);
