@@ -1,7 +1,7 @@
 import { Network } from '@balancer-labs/sdk';
 
 export interface NetworkConfig {
-  id: Network | 80001 | 1101 | 43114 | 8453;
+  id: Network | 80001 | 1101 | 43114 | 8453 | 100;
   name: string;
   logo: string;
   explorer: string;
@@ -64,5 +64,12 @@ export const NETWORKS: NetworkConfig[] = [
     logo: '',
     explorer: 'https://basescan.org/',
     rpcUrl: 'https://base-pokt.nodies.app',
+  },
+  {
+    id: 100,
+    name: 'Gnosis',
+    logo: '',
+    explorer: 'https://gnosisscan.io/',
+    rpcUrl: 'https://gnosis-pokt.nodies.app',
   },
 ];

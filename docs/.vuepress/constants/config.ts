@@ -79,4 +79,13 @@ export const CONFIG = new Map<number, Config>([
       LENS_REWARD_CONTRACT: '0xe922ae35d0cd042db5bade95e50a5cb0f14fa1d9',
     },
   ],
+  [
+    100, // gnosis
+    {
+      SUBGRAPH_URL:
+        'https://api.thegraph.com/subgraphs/name/maxkmyt/launchpad_gnosis',
+      LAUNCHPAD_CONTRACT: '0x41b5b45f849a39cf7ac4aceae6c78a72e3852133',
+      LENS_REWARD_CONTRACT: '0xe922ae35d0cd042db5bade95e50a5cb0f14fa1d9',
+    },
+  ],
 ]);
