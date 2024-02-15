@@ -84,8 +84,8 @@ export const CONFIG = new Map<number, Config>([
     {
       SUBGRAPH_URL:
         'https://api.thegraph.com/subgraphs/name/maxkmyt/launchpad_sepolia',
-      LAUNCHPAD_CONTRACT: '0x4d3c7c2786a16e24c948dca25a77f52087521633',
-      LENS_REWARD_CONTRACT: '0x8bc129435f2f89770b48b7ca282f6ed82f1a7e39',
+      LAUNCHPAD_CONTRACT: '0x7af720678f7aa15542acdcf6d613c7a94e0cf703',
+      LENS_REWARD_CONTRACT: '0xa5ef725d0becf0262450bb255f4341d5da40e489',
     },
   ],
 ]);
