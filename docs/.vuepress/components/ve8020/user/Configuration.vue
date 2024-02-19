@@ -655,7 +655,7 @@ watch(items, value => console.log('items', value));
   border-radius: 6px;
   height: 100%;
   width: 100%;
-  max-width: 340px;
+  /* max-width: 340px; */
   padding-inline: 20px;
   font-size: 14px;
   outline: none;
