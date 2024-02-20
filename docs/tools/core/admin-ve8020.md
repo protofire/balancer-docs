@@ -12,8 +12,5 @@ To create a Vote Escrow system, you will need a Balancer Pool Token (BPT) that i
 ### Step 2 - Deploy Voting Escrow System
 Use this Admin panel with the admin wallet to create your VE system. For direct access to contracts, see [this guide](/reference/vote-escrow-launchpad/1_launchpad). 
 
-### Step 3 - Activate BAL Rewards for Lockers
-*Add content
-
-### Step 4 - Add Your Own Reward Program
+### Step 3 - Add Your Own Reward Program
 Use the "Rewards Distribution" tab to set Reward Token and permisssions. For more detailed information see [Reward Distributor Guide](/reference/vote-escrow-launchpad/3_RewardDistributor) and the [Reward Faucet Guide](/reference/vote-escrow-launchpad/4_RewardFaucet)
