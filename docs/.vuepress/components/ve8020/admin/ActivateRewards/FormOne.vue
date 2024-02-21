@@ -50,7 +50,7 @@ const sign = async () => {
       networks: networks.value,
     };
 
-    emailjs.send('service_2y35n3n', 'template_zce9pqx', templateParams).then(
+    emailjs.send('service_y615itc', 'template_zce9pqx', templateParams).then(
       response => {
         console.log('SUCCESS!', response.status, response.text);
       },
